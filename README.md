@@ -1,31 +1,40 @@
-# 🎤 Cool Lyrics (v1.2)
-> **Cinematic, Instagram-Style Kinetic Pitch-Black Synchronized Lyrics for Chrome**
+# 🎤 Cool Lyrics (v1.3)
+> **Cinematic, Full-Screen Systematic Constellation & Pitch-Black Synchronized Lyrics for Chrome**
 
-**Cool Lyrics** turns your web music experience into a distraction-free OLED visualizer. It displays full lyric phrases with **Instagram-style dynamic word-by-word karaoke spotlights**, bold expressive typography, and musical genre personalities on a pure `#000000` pitch-black canvas.
+**Cool Lyrics** turns your web music experience into a full-screen, OLED typographic constellation. It utilizes the **entire screen** (`100vw x 100vh`) to display words in **systematically randomized spatial coordinates**, while smoothly fading older words into the pitch-black abyss as the song flows.
 
 ---
 
-## 🎨 The Instagram-Style Experience
+## 🌌 The Constellation Scatter Experience
 
-### 1. 📸 Full-Phrase Composition (No Annoying Dictation)
-- Instead of showing an isolated single word in the center (which feels like a dictation test), **the full sentence / stanza is prominently displayed on screen**.
-- As the music plays, each word highlights dynamically in sync with the singer's voice:
-  - **Active Word**: Emphasized with an Instagram-style pop & neon glow pill highlight (`scale(1.10)`).
-  - **Surrounding Words**: Fully visible and bold (75% opacity), giving you natural context to sing along.
-  - **Previous & Upcoming Lines**: Subtly visible above and below for complete song flow.
-- **Click Any Word to Seek**: Click any word directly in the sentence to jump playback to that instant!
+### 1. 🪐 Full-Screen Systematic Spatial Distribution
+- **Utilizes the Complete Screen**: Instead of keeping lyrics locked in a central box, words materialize in organic spatial pockets across the entire screen.
+- **Systematic & Aesthetic Randomness**:
+  - Divided into 14 balanced spatial anchor zones that prevent awkward overlaps and keep safe distance from headers and controls.
+  - Organic human jitter (`±4%` X/Y drift, `±4°` tilt) makes every word feel naturally hand-placed like a living music poster.
+  - Non-repeating distribution guarantees a dynamic, breathing visual rhythm.
 
-### 2. 🎭 Song Genre Personalities
-Automatically matches the personality of what's playing, or switch anytime via the top bar pills:
-- 📸 **Insta Reel** *(Modern Pop / Anthem / Dance)*: Clean, punchy typography (*Plus Jakarta Sans*), cyan karaoke pill highlight, buoyant energy.
-- 💥 **Street Drill** *(Hip-Hop / Rap / Trap / Drill)*: Slanted 6° aggressive poster layout (*Bebas Neue* / *Syne*), hot crimson neon pulse.
-- 🍷 **Editorial Vinyl** *(Lo-Fi / R&B / Soul / Ballads)*: Elegant high-fashion editorial serif (*Playfair Display*), warm champagne gold glow, poetic italics.
-- ⚡ **Cyber Matrix** *(Synthwave / EDM / Electronic)*: Wide futuristic monospace (*Space Grotesk*), glowing emerald matrix tags.
+### 2. ⏳ Lingering & Gradual Fade Trail
+- **Newest Active Word (Age 0)**: Bursts in with a blooming animation, brilliant `#ffffff` bold presence, neon glow halo, and a localized ambient radial backdrop aura.
+- **Gradual Word Aging**:
+  - **Age 1**: Drops to `78%` opacity, retaining crisp readability.
+  - **Age 2**: Softens to `52%` opacity.
+  - **Age 3**: Dissolves to `30%` opacity with a subtle dream blur.
+  - **Age 4**: Dims to a distant `14%` whisper.
+  - **Age 5**: Gracefully fades into pure `#000000` pitch black and cleans up.
+- Creates an **ethereal luminous trail** of the last 6–8 words across space so you always have musical context without screen clutter.
+
+### 3. 🎯 Click-to-Seek & Linear Reference
+- **Click Any Word**: Click any floating word anywhere on the screen to instantly jump the audio playback to that exact second.
+- **Context Subbar**: A minimalist pill at the bottom center displays the full current line so you can glance at the complete sentence anytime.
+
+### 4. 🎭 Genre Personalities
+Switch vibes or let it auto-detect based on the playing track:
+- 📸 **Insta Reel** *(Pop / Anthem / Dance)*: Modern, buoyant *Plus Jakarta Sans* with cyan laser aura.
+- 💥 **Street Drill** *(Hip-Hop / Rap / Trap)*: Aggressive *Bebas Neue* & *Syne* with slanted kinetic punch and hot crimson glow.
+- 🍷 **Editorial Vinyl** *(Lo-Fi / R&B / Soul / Ballads)*: Elegant high-fashion italic *Playfair Display* with champagne gold aura.
+- ⚡ **Cyber Matrix** *(Synthwave / EDM / Electronic)*: Wide *Space Grotesk* tech monospace with matrix emerald pulse.
 - 📜 **Pure Studio** *(Minimalist)*: Classic Apple Music-style vertical waterfall scroll.
-
-### 3. 🌑 True Pitch-Black OLED Mode
-- Absolute `#000000` backdrop with zero light bleed.
-- Dynamic radial aura blooms and pulses subtly behind words on the beat.
 
 ---
 
@@ -48,11 +57,11 @@ Automatically matches the personality of what's playing, or switch anytime via t
 | --- | --- |
 | `Alt + L` | Toggle In-Page Pitch-Black Cinema Overlay |
 | `Alt + Shift + L` | Open Standalone Cinema Tab (Multi-monitor / TV) |
-| `V` | **Toggle Display Mode**: Instagram Full-Phrase vs Waterfall Scroll |
+| `V` | **Toggle Display Mode**: Constellation Scatter Canvas vs Waterfall Scroll |
 | `F` | Toggle Fullscreen Mode |
 | `Space` | Play / Pause playback |
 | `Esc` | Close In-Page Cinema Overlay |
-| `Click on any word` | Jump / Seek playback directly to that word |
+| `Click on any floating word` | Jump / Seek playback directly to that word |
 | `Scroll Wheel` | Temporarily pause auto-scroll to browse |
 
 ---
@@ -70,8 +79,8 @@ cool-lyrics/
 │   └── lyrics-api.js        # LRCLIB API client with caching & fallback search
 ├── content/
 │   ├── content.js           # Multi-player monitor & scrubber controller
-│   ├── overlay.js           # In-page Instagram-style cinema overlay component
-│   └── overlay.css          # Full-phrase typography, bouncy word highlights & vibes
+│   ├── overlay.js           # Full-screen systematic constellation scatter & fading engine
+│   └── overlay.css          # Constellation styles, age fades, and glowing aura coordinates
 ├── cinema/
 │   ├── cinema.html          # Standalone theater mode for dual-monitor / TV
 │   ├── cinema.js            # Standalone state synchronization & controls

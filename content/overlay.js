@@ -1,6 +1,6 @@
 /**
- * Cool Lyrics - In-Page Instagram-Style Cinema Overlay Component
- * Features Full-Phrase Typography with Dynamic Word Karaoke Highlights
+ * Cool Lyrics - In-Page Systematic Constellation Scatter & Cinema Overlay
+ * Spreads words across the screen systematically while smoothly fading older words.
  */
 
 class LyricsOverlay {
@@ -16,11 +16,17 @@ class LyricsOverlay {
     this.lyricsData = null;
     this.activeLineIndex = -1;
     this.activeWordIndex = -1;
+    this.currentWordText = '';
     this.userOffset = 0;
     
-    this.displayMode = 'insta'; // 'insta' (Instagram Full-Phrase) or 'waterfall' (Classic Scroll)
-    this.currentVibe = 'reel';  // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
+    this.displayMode = 'scatter'; // 'scatter' (Constellation Canvas) or 'waterfall' (Classic Scroll)
+    this.currentVibe = 'reel';    // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
     
+    // Constellation history: array of { el, word, time, age, zoneIdx }
+    this.scatterWords = [];
+    this.lastZoneIndices = [];
+    this.MAX_ACTIVE_WORDS = 7;
+
     this.idleTimer = null;
     this.isUserScrolling = false;
     this.userScrollResumeTimer = null;
@@ -60,7 +66,7 @@ class LyricsOverlay {
           </div>
 
           <button class="cl-btn" id="cl-btn-mode" title="Toggle Display Mode (V)">
-            <span id="cl-mode-icon">✨</span> <span id="cl-mode-text">Insta Mode</span>
+            <span id="cl-mode-icon">🌌</span> <span id="cl-mode-text">Scatter Canvas</span>
           </button>
           <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Standalone Window">
             <span>⧉</span>
@@ -74,16 +80,14 @@ class LyricsOverlay {
         </div>
       </header>
 
-      <!-- Stage 1: Instagram-Style Full-Phrase Lyric Stage -->
-      <main class="cl-insta-stage" id="cl-insta-stage">
-        <div class="cl-insta-wrapper">
-          <div class="cl-insta-line-prev" id="cl-line-prev"></div>
-          <div class="cl-insta-line-active" id="cl-line-active">
-            <span class="cl-word active">READY</span>
-          </div>
-          <div class="cl-insta-line-next" id="cl-line-next"></div>
-        </div>
-      </main>
+      <!-- Stage 1: Systematic Constellation Scatter Stage -->
+      <main class="cl-constellation-stage" id="cl-constellation-stage"></main>
+
+      <!-- Bottom Linear Context Subbar -->
+      <div class="cl-sentence-subbar" id="cl-sentence-subbar">
+        <span class="cl-sentence-badge">NOW</span>
+        <span id="cl-subbar-text">Play a song to start lyrics</span>
+      </div>
 
       <!-- Stage 2: Classic Waterfall Scroll Container -->
       <main class="cl-lyrics-container" id="cl-lyrics-scroll" style="display: none;">
@@ -131,10 +135,9 @@ class LyricsOverlay {
     // Elements
     this.header = root.querySelector('.cl-header');
     this.footer = root.querySelector('.cl-footer');
-    this.instaStage = root.querySelector('#cl-insta-stage');
-    this.linePrevEl = root.querySelector('#cl-line-prev');
-    this.lineActiveEl = root.querySelector('#cl-line-active');
-    this.lineNextEl = root.querySelector('#cl-line-next');
+    this.constellationStage = root.querySelector('#cl-constellation-stage');
+    this.sentenceSubbar = root.querySelector('#cl-sentence-subbar');
+    this.subbarText = root.querySelector('#cl-subbar-text');
     this.radialGlow = root.querySelector('#cl-radial-glow');
 
     this.lyricsContainer = root.querySelector('#cl-lyrics-scroll');
@@ -230,18 +233,20 @@ class LyricsOverlay {
   }
 
   toggleDisplayMode() {
-    this.setDisplayMode(this.displayMode === 'insta' ? 'waterfall' : 'insta');
+    this.setDisplayMode(this.displayMode === 'scatter' ? 'waterfall' : 'scatter');
   }
 
   setDisplayMode(mode) {
     this.displayMode = mode;
-    if (mode === 'insta') {
-      this.instaStage.style.display = 'flex';
+    if (mode === 'scatter') {
+      this.constellationStage.style.display = 'block';
+      this.sentenceSubbar.style.display = 'flex';
       this.lyricsContainer.style.display = 'none';
-      this.modeIcon.textContent = '✨';
-      this.modeText.textContent = 'Insta Mode';
+      this.modeIcon.textContent = '🌌';
+      this.modeText.textContent = 'Scatter Canvas';
     } else {
-      this.instaStage.style.display = 'none';
+      this.constellationStage.style.display = 'none';
+      this.sentenceSubbar.style.display = 'none';
       this.lyricsContainer.style.display = 'flex';
       this.modeIcon.textContent = '📜';
       this.modeText.textContent = 'Waterfall';
@@ -252,11 +257,13 @@ class LyricsOverlay {
   resetIdleTimer() {
     this.header.classList.remove('cl-idle-hidden');
     this.footer.classList.remove('cl-idle-hidden');
+    this.sentenceSubbar.style.opacity = '1';
     clearTimeout(this.idleTimer);
     this.idleTimer = setTimeout(() => {
       if (this.isVisible) {
         this.header.classList.add('cl-idle-hidden');
         this.footer.classList.add('cl-idle-hidden');
+        this.sentenceSubbar.style.opacity = '0';
       }
     }, 2800);
   }
@@ -320,7 +327,6 @@ class LyricsOverlay {
 
     this.durationEl.textContent = LrcParser.formatTime(track.duration || 0);
 
-    // Auto-detect Instagram-style vibe based on genre
     if (typeof GenreDetector !== 'undefined') {
       const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
       this.setVibe(autoVibe);
@@ -330,18 +336,19 @@ class LyricsOverlay {
   updateLyrics(lyricsResult) {
     this.lyricsData = lyricsResult;
     this.lyricsContainer.innerHTML = '';
+    this.constellationStage.innerHTML = '';
+    this.scatterWords = [];
+    this.lastZoneIndices = [];
     this.activeLineIndex = -1;
     this.activeWordIndex = -1;
+    this.currentWordText = '';
 
     if (!lyricsResult || !lyricsResult.lines || lyricsResult.lines.length === 0) {
       const msg = lyricsResult && lyricsResult.instrumental
         ? '♪ Instrumental Track ♪'
         : 'No synchronized lyrics found';
 
-      this.lineActiveEl.innerHTML = `<span class="cl-word active">${msg}</span>`;
-      this.linePrevEl.textContent = '';
-      this.lineNextEl.textContent = 'Enjoy the rhythm';
-
+      this.subbarText.textContent = msg;
       this.lyricsContainer.innerHTML = `
         <div class="cl-status-view">
           <span style="font-size: 2rem;">✨</span>
@@ -385,71 +392,123 @@ class LyricsOverlay {
     // Fetch multi-line & word context
     const ctx = LrcParser.getLyricsContext(this.lyricsData.lines, currentTime, this.userOffset);
     if (ctx) {
-      this.renderInstaLyrics(ctx);
+      this.renderConstellationWord(ctx);
     }
 
-    // Waterfall update
+    // Waterfall active line update
     const lineIdx = ctx ? ctx.lineIndex : LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
     if (lineIdx !== this.activeLineIndex) {
       this.setActiveLine(lineIdx);
     }
   }
 
-  renderInstaLyrics(ctx) {
-    const { lineIndex, activeWordIndex, currentLine, prevLine, nextLine } = ctx;
+  /**
+   * Systematic Constellation Scatter Engine:
+   * Selects an aesthetic non-colliding zone across the full screen,
+   * adds organic jitter, and smoothly fades older words into the dark abyss.
+   */
+  renderConstellationWord(ctx) {
+    const { currentWord, currentLine, activeWordIndex, lineIndex } = ctx;
+    const cleanWord = currentWord.trim();
+    if (!cleanWord) return;
 
-    // Check if line changed -> rebuild word elements
-    if (lineIndex !== this.activeLineIndex) {
-      this.activeLineIndex = lineIndex;
-      this.activeWordIndex = -1;
+    // Word key to avoid re-triggering during the same word's duration
+    const wordKey = `${lineIndex}:${activeWordIndex}:${cleanWord}`;
+    if (wordKey === this.currentWordText) return;
+    this.currentWordText = wordKey;
 
-      // Update surrounding context lines
-      this.linePrevEl.textContent = prevLine ? prevLine.text : '';
-      this.lineNextEl.textContent = nextLine ? nextLine.text : '';
+    // Update bottom linear phrase subbar
+    this.subbarText.textContent = currentLine.text;
 
-      // Build word elements inside active line
-      this.lineActiveEl.innerHTML = '';
-      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
-      
-      words.forEach((wObj, idx) => {
-        const span = document.createElement('span');
-        span.className = 'cl-word';
-        span.dataset.index = idx;
-        span.textContent = wObj.word;
+    // 1. Age existing words on screen and fade them out progressively
+    for (let i = this.scatterWords.length - 1; i >= 0; i--) {
+      const item = this.scatterWords[i];
+      item.age += 1;
+      item.el.className = `cl-scatter-word age-${Math.min(5, item.age)}`;
 
-        // Click to seek directly to this word!
-        span.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.onSeek(wObj.time);
-        });
+      // Slight natural drift as words fade
+      const currentRot = item.rot || 0;
+      const driftY = item.age * 6;
+      item.el.style.transform = `translateY(${driftY}px) rotate(${currentRot}deg)`;
 
-        this.lineActiveEl.appendChild(span);
-      });
-    }
-
-    // Check if word emphasis changed
-    if (activeWordIndex !== this.activeWordIndex) {
-      this.activeWordIndex = activeWordIndex;
-
-      const wordSpans = this.lineActiveEl.querySelectorAll('.cl-word');
-      wordSpans.forEach((span, idx) => {
-        span.classList.remove('active', 'passed', 'upcoming');
-        if (idx < activeWordIndex) {
-          span.classList.add('passed');
-        } else if (idx === activeWordIndex) {
-          span.classList.add('active');
-        } else {
-          span.classList.add('upcoming');
-        }
-      });
-
-      // Pulse background aura
-      if (this.radialGlow) {
-        this.radialGlow.classList.remove('cl-glow-pulse');
-        void this.radialGlow.offsetWidth;
-        this.radialGlow.classList.add('cl-glow-pulse');
+      // If word has reached age 5, remove from DOM
+      if (item.age >= 5) {
+        setTimeout(() => {
+          if (item.el.parentNode) item.el.remove();
+        }, 800);
+        this.scatterWords.splice(i, 1);
       }
     }
+
+    // 2. Systematic Zone Selection across the full 100vw x 100vh canvas
+    // 14 carefully balanced spatial anchor zones that cover the full screen
+    const ZONES = [
+      { x: 14, y: 22 }, { x: 38, y: 19 }, { x: 62, y: 23 }, { x: 82, y: 21 },
+      { x: 20, y: 38 }, { x: 45, y: 35 }, { x: 74, y: 39 },
+      { x: 12, y: 55 }, { x: 36, y: 54 }, { x: 60, y: 56 }, { x: 84, y: 53 },
+      { x: 22, y: 72 }, { x: 48, y: 70 }, { x: 76, y: 72 }
+    ];
+
+    // Filter out recently used zones to avoid awkward stacking
+    const availableIndices = [];
+    for (let i = 0; i < ZONES.length; i++) {
+      if (!this.lastZoneIndices.includes(i)) {
+        availableIndices.push(i);
+      }
+    }
+
+    const pool = availableIndices.length > 0 ? availableIndices : [0, 1, 2, 3, 4, 5];
+    const pickedIdx = pool[Math.floor(Math.random() * pool.length)];
+
+    this.lastZoneIndices.push(pickedIdx);
+    if (this.lastZoneIndices.length > 4) {
+      this.lastZoneIndices.shift();
+    }
+
+    const baseZone = ZONES[pickedIdx];
+
+    // Add organic human jitter: +/- 4% on X, +/- 3% on Y, and slight rotation (-4° to +4°)
+    const jitterX = (Math.random() - 0.5) * 8;
+    const jitterY = (Math.random() - 0.5) * 6;
+    const finalX = Math.max(8, Math.min(84, baseZone.x + jitterX));
+    const finalY = Math.max(18, Math.min(76, baseZone.y + jitterY));
+    const rotation = (Math.random() - 0.5) * 8;
+
+    // 3. Create the new Age-0 word element
+    const wordEl = document.createElement('div');
+    wordEl.className = 'cl-scatter-word age-0';
+    wordEl.textContent = cleanWord;
+    wordEl.style.left = `${finalX}vw`;
+    wordEl.style.top = `${finalY}vh`;
+    wordEl.style.transform = `rotate(${rotation.toFixed(1)}deg)`;
+
+    // Click to seek to that word
+    const wordTime = currentLine.words && currentLine.words[activeWordIndex] ? currentLine.words[activeWordIndex].time : currentLine.time;
+    wordEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.onSeek(wordTime);
+    });
+
+    this.constellationStage.appendChild(wordEl);
+
+    // 4. Smoothly shift ambient radial aura behind the newest word
+    if (this.radialGlow) {
+      this.radialGlow.style.left = `${finalX}vw`;
+      this.radialGlow.style.top = `${finalY}vh`;
+      this.radialGlow.classList.remove('cl-glow-pulse');
+      void this.radialGlow.offsetWidth;
+      this.radialGlow.classList.add('cl-glow-pulse');
+    }
+
+    // Track active scatter item
+    this.scatterWords.unshift({
+      el: wordEl,
+      word: cleanWord,
+      time: wordTime,
+      age: 0,
+      rot: rotation,
+      zoneIdx: pickedIdx
+    });
   }
 
   setActiveLine(index) {

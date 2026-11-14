@@ -1,19 +1,15 @@
-/* Cool Lyrics - Cinema Standalone Instagram-Style Mode Styling */
+/* Cool Lyrics - Cinema Standalone Systematic Constellation Scatter Styling */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --bg-color: #000000;
   --text-active: #ffffff;
-  --text-passed: rgba(255, 255, 255, 0.82);
-  --text-pending: rgba(255, 255, 255, 0.52);
-  --text-context: rgba(255, 255, 255, 0.24);
   --accent-color: #00f0ff;
   --glow-color: rgba(0, 240, 255, 0.55);
   --pill-bg: rgba(0, 240, 255, 0.14);
   --font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  --slant: 0deg;
 }
 
 * {
@@ -43,7 +39,6 @@ body.cl-vibe-reel {
   --accent-color: #00f0ff;
   --glow-color: rgba(0, 240, 255, 0.5);
   --pill-bg: rgba(0, 240, 255, 0.16);
-  --slant: 0deg;
 }
 
 /* 2. 💥 Street Drill */
@@ -52,11 +47,6 @@ body.cl-vibe-slanted {
   --accent-color: #ff0055;
   --glow-color: rgba(255, 0, 85, 0.65);
   --pill-bg: rgba(255, 0, 85, 0.2);
-  --slant: -6deg;
-}
-
-body.cl-vibe-slanted .cl-insta-line-active {
-  letter-spacing: 0.035em;
 }
 
 /* 3. 🍷 Editorial Vinyl */
@@ -65,12 +55,10 @@ body.cl-vibe-editorial {
   --accent-color: #fbbf24;
   --glow-color: rgba(251, 191, 36, 0.45);
   --pill-bg: rgba(251, 191, 36, 0.14);
-  --slant: 0deg;
 }
 
-body.cl-vibe-editorial .cl-word.active {
+body.cl-vibe-editorial .cl-scatter-word.age-0 {
   font-style: italic;
-  font-weight: 900;
 }
 
 /* 4. ⚡ Cyber Matrix */
@@ -79,7 +67,6 @@ body.cl-vibe-cyber {
   --accent-color: #10b981;
   --glow-color: rgba(16, 185, 129, 0.55);
   --pill-bg: rgba(16, 185, 129, 0.16);
-  --slant: 0deg;
 }
 
 /* 5. 📜 Minimal Studio */
@@ -88,7 +75,6 @@ body.cl-vibe-classic {
   --accent-color: #ffffff;
   --glow-color: rgba(255, 255, 255, 0.3);
   --pill-bg: rgba(255, 255, 255, 0.1);
-  --slant: 0deg;
 }
 
 .cl-cinema-root {
@@ -111,17 +97,15 @@ body.cl-vibe-classic {
 
 .cl-radial-glow {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 75vw;
-  height: 75vw;
+  width: 60vw;
+  height: 60vw;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   filter: blur(150px);
   background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 65%);
-  opacity: 0.3;
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
+  opacity: 0.32;
+  transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1), top 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  will-change: left, top, opacity;
 }
 
 .cl-glow-pulse {
@@ -130,8 +114,8 @@ body.cl-vibe-classic {
 
 @keyframes aura-beat {
   0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.2; }
-  50% { transform: translate(-50%, -50%) scale(1.14); opacity: 0.55; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+  50% { transform: translate(-50%, -50%) scale(1.14); opacity: 0.58; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.32; }
 }
 
 /* Top Navigation Bar */
@@ -145,7 +129,7 @@ body.cl-vibe-classic {
   justify-content: space-between;
   align-items: center;
   padding: 24px 40px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, transparent 100%);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -257,115 +241,146 @@ body.cl-vibe-classic {
 }
 
 /* ===================================================
-   STAGE 1: INSTAGRAM-STYLE FULL-PHRASE STAGE
+   SYSTEMATIC CONSTELLATION SCATTER STAGE
    =================================================== */
 
-.cl-insta-stage {
-  position: relative;
+.cl-constellation-stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 10;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8vw;
-  text-align: center;
   overflow: hidden;
+  pointer-events: none;
 }
 
-.cl-insta-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  transform: skewX(var(--slant));
-  transition: transform 0.3s ease;
-}
-
-.cl-insta-line-prev {
-  font-family: var(--font-lyric);
-  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--text-context);
-  filter: blur(1px);
-  transform: translateY(-6px);
-  transition: all 0.35s ease;
-  max-width: 900px;
-}
-
-.cl-insta-line-active {
-  font-family: var(--font-lyric);
-  font-size: clamp(2.5rem, 5vw, 4.6rem);
-  font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 12px 16px;
-  max-width: 1150px;
-  padding: 12px 20px;
-  border-radius: 24px;
-  transition: all 0.3s ease;
-}
-
-.cl-word {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 14px;
+.cl-scatter-word {
+  position: absolute;
+  transform-origin: center;
+  pointer-events: auto;
   cursor: pointer;
-  position: relative;
-  transition: all 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-}
-
-.cl-word.passed {
-  color: var(--text-passed);
-  opacity: 0.9;
-}
-
-.cl-word.upcoming {
-  color: var(--text-pending);
-  opacity: 0.6;
-}
-
-.cl-word.active {
-  color: #ffffff;
-  background: var(--pill-bg);
-  box-shadow: 0 0 26px var(--glow-color), 0 0 50px var(--glow-color);
-  transform: scale(1.1);
-  font-weight: 900;
-  opacity: 1;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  animation: word-bounce 0.24s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-@keyframes word-bounce {
-  0% { transform: scale(0.96); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1.1); }
-}
-
-.cl-word:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.cl-insta-line-next {
   font-family: var(--font-lyric);
-  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  padding: 8px 20px;
+  border-radius: 18px;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.8s ease;
+  will-change: transform, opacity, filter;
+}
+
+/* Age 0: Newest Active Word */
+.cl-scatter-word.age-0 {
+  font-size: clamp(3.4rem, 6.5vw, 6.8rem);
+  font-weight: 900;
+  color: #ffffff;
+  opacity: 1;
+  z-index: 25;
+  background: var(--pill-bg);
+  box-shadow: 0 0 38px var(--glow-color), 0 0 80px var(--glow-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: scatter-bloom 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes scatter-bloom {
+  0% { transform: scale(0.7) translateY(14px); opacity: 0.2; }
+  60% { transform: scale(1.08) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Age 1 */
+.cl-scatter-word.age-1 {
+  font-size: clamp(2.9rem, 5.4vw, 5.6rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.82);
+  opacity: 0.78;
+  z-index: 20;
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid transparent;
+}
+
+/* Age 2 */
+.cl-scatter-word.age-2 {
+  font-size: clamp(2.5rem, 4.6vw, 4.8rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.58);
+  opacity: 0.52;
+  z-index: 15;
+}
+
+/* Age 3 */
+.cl-scatter-word.age-3 {
+  font-size: clamp(2.2rem, 4.0vw, 4.2rem);
   font-weight: 600;
-  line-height: 1.35;
-  color: var(--text-context);
-  filter: blur(1px);
-  transform: translateY(6px);
-  transition: all 0.35s ease;
-  max-width: 900px;
+  color: rgba(255, 255, 255, 0.38);
+  opacity: 0.30;
+  filter: blur(0.6px);
+  z-index: 10;
+}
+
+/* Age 4 */
+.cl-scatter-word.age-4 {
+  font-size: clamp(1.9rem, 3.4vw, 3.5rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.22);
+  opacity: 0.14;
+  filter: blur(1.5px);
+  z-index: 5;
+}
+
+/* Age 5 */
+.cl-scatter-word.age-5 {
+  opacity: 0;
+  filter: blur(3px);
+  transform: scale(0.92);
+  z-index: 1;
+}
+
+.cl-scatter-word:hover {
+  opacity: 1 !important;
+  color: #ffffff !important;
+  filter: blur(0) !important;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Minimal sentence banner at bottom center for linear context */
+.cl-sentence-subbar {
+  position: absolute;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 18px;
+  background: rgba(15, 15, 20, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  backdrop-filter: blur(16px);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  max-width: 80vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.cl-sentence-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  background: var(--pill-bg);
+  color: var(--accent-color);
+  border-radius: 999px;
 }
 
 /* ===================================================
