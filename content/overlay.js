@@ -1,5 +1,6 @@
 /**
- * Cool Lyrics - In-Page Pitch Black Cinema Overlay Component
+ * Cool Lyrics - In-Page Artistic Cinema Overlay Component
+ * Features Kinetic Word Hero Mode & Genre-Responsive Aesthetics
  */
 
 class LyricsOverlay {
@@ -12,10 +13,14 @@ class LyricsOverlay {
 
     this.isVisible = false;
     this.currentTrack = null;
-    this.lyricsData = null; // { lines: [], isSynced: boolean }
+    this.lyricsData = null;
     this.activeLineIndex = -1;
-    this.userOffset = 0; // seconds
-    this.theme = 'pure-black'; // 'pure-black', 'ambient', 'neon'
+    this.currentHeroWord = '';
+    this.userOffset = 0;
+    
+    this.displayMode = 'hero'; // 'hero' (Kinetic Word) or 'waterfall' (Classic Scroll)
+    this.currentVibe = 'kinetic'; // 'kinetic', 'cyber', 'dreamwave', 'velvet', 'waterfall'
+    
     this.idleTimer = null;
     this.isUserScrolling = false;
     this.userScrollResumeTimer = null;
@@ -28,9 +33,10 @@ class LyricsOverlay {
 
     const root = document.createElement('div');
     root.id = 'cool-lyrics-root';
+    root.className = `cl-vibe-${this.currentVibe}`;
     root.innerHTML = `
       <div class="cl-bg-layer">
-        <div class="cl-bg-glow"></div>
+        <div class="cl-bg-glow" id="cl-radial-glow"></div>
       </div>
 
       <!-- Header -->
@@ -44,10 +50,19 @@ class LyricsOverlay {
         </div>
 
         <div class="cl-header-actions">
-          <button class="cl-btn" id="cl-btn-theme" title="Cycle visual theme">
-            <span>✨</span> <span id="cl-theme-name">Pitch Black</span>
+          <!-- Vibe Selector -->
+          <div class="cl-vibe-pill-group" id="cl-vibe-selector">
+            <button class="cl-vibe-pill active" data-vibe="kinetic">💥 Kinetic</button>
+            <button class="cl-vibe-pill" data-vibe="cyber">⚡ Cyber</button>
+            <button class="cl-vibe-pill" data-vibe="dreamwave">🌌 Dream</button>
+            <button class="cl-vibe-pill" data-vibe="velvet">🖤 Velvet</button>
+            <button class="cl-vibe-pill" data-vibe="waterfall">📜 Scroll</button>
+          </div>
+
+          <button class="cl-btn" id="cl-btn-mode" title="Toggle Display Mode (V)">
+            <span id="cl-mode-icon">🎯</span> <span id="cl-mode-text">Word Hero</span>
           </button>
-          <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Open in Standalone Cinema Window">
+          <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Standalone Window">
             <span>⧉</span>
           </button>
           <button class="cl-btn cl-btn-icon" id="cl-btn-fullscreen" title="Fullscreen (F)">
@@ -59,8 +74,19 @@ class LyricsOverlay {
         </div>
       </header>
 
-      <!-- Center Lyrics Scroll Container -->
-      <main class="cl-lyrics-container" id="cl-lyrics-scroll">
+      <!-- Stage 1: Kinetic Word Hero Display -->
+      <main class="cl-hero-stage" id="cl-hero-stage">
+        <div class="cl-hero-word-box">
+          <div class="cl-hero-word" id="cl-hero-word">READY</div>
+          <div class="cl-hero-context">
+            <div class="cl-hero-line-track" id="cl-hero-line-track"></div>
+            <div class="cl-hero-upcoming" id="cl-hero-upcoming"></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Stage 2: Fluid Waterfall Scroll Container -->
+      <main class="cl-lyrics-container" id="cl-lyrics-scroll" style="display: none;">
         <div class="cl-status-view">
           <div class="cl-spinner"></div>
           <span>Waiting for track to start...</span>
@@ -93,7 +119,7 @@ class LyricsOverlay {
           </div>
 
           <div style="font-size: 0.8rem; color: rgba(255,255,255,0.4);">
-            <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Esc</kbd> Exit
+            <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">V</kbd> Mode &nbsp;•&nbsp; <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Esc</kbd> Exit
           </div>
         </div>
       </footer>
@@ -102,9 +128,15 @@ class LyricsOverlay {
     document.body.appendChild(root);
     this.root = root;
 
-    // Cache elements
+    // Elements
     this.header = root.querySelector('.cl-header');
     this.footer = root.querySelector('.cl-footer');
+    this.heroStage = root.querySelector('#cl-hero-stage');
+    this.heroWordEl = root.querySelector('#cl-hero-word');
+    this.heroLineTrackEl = root.querySelector('#cl-hero-line-track');
+    this.heroUpcomingEl = root.querySelector('#cl-hero-upcoming');
+    this.radialGlow = root.querySelector('#cl-radial-glow');
+
     this.lyricsContainer = root.querySelector('#cl-lyrics-scroll');
     this.artworkImg = root.querySelector('.cl-artwork');
     this.titleEl = root.querySelector('.cl-track-title');
@@ -114,18 +146,17 @@ class LyricsOverlay {
     this.progressBar = root.querySelector('#cl-progress-bar');
     this.progressFill = root.querySelector('#cl-progress-fill');
     this.playBtn = root.querySelector('#cl-btn-play');
-    this.themeName = root.querySelector('#cl-theme-name');
     this.offsetVal = root.querySelector('#cl-offset-val');
+    this.modeBtn = root.querySelector('#cl-btn-mode');
+    this.modeIcon = root.querySelector('#cl-mode-icon');
+    this.modeText = root.querySelector('#cl-mode-text');
 
     this.bindEvents();
   }
 
   bindEvents() {
-    // Close & Popout
     this.root.querySelector('#cl-btn-close').addEventListener('click', () => this.hide());
     this.root.querySelector('#cl-btn-popout').addEventListener('click', () => this.onOpenCinemaTab());
-
-    // Fullscreen
     this.root.querySelector('#cl-btn-fullscreen').addEventListener('click', () => this.toggleFullscreen());
 
     // Playback buttons
@@ -133,8 +164,15 @@ class LyricsOverlay {
     this.root.querySelector('#cl-btn-prev').addEventListener('click', () => this.onPrev());
     this.root.querySelector('#cl-btn-next').addEventListener('click', () => this.onNext());
 
-    // Theme cycle
-    this.root.querySelector('#cl-btn-theme').addEventListener('click', () => this.cycleTheme());
+    // Display mode toggle (Hero Word vs Waterfall Scroll)
+    this.modeBtn.addEventListener('click', () => this.toggleDisplayMode());
+
+    // Vibe / Genre selector buttons
+    this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.setVibe(btn.dataset.vibe);
+      });
+    });
 
     // Offset tuner
     this.root.querySelector('#cl-offset-minus').addEventListener('click', () => this.adjustOffset(-0.5));
@@ -149,7 +187,7 @@ class LyricsOverlay {
       this.onSeek(pos * this.currentTrack.duration);
     });
 
-    // Handle manual scrolling pause/resume
+    // Scroll wheel pause
     this.lyricsContainer.addEventListener('wheel', () => {
       this.isUserScrolling = true;
       clearTimeout(this.userScrollResumeTimer);
@@ -159,10 +197,10 @@ class LyricsOverlay {
       }, 3500);
     }, { passive: true });
 
-    // Auto-hide controls when mouse is idle
+    // Idle auto-hide
     this.root.addEventListener('mousemove', () => this.resetIdleTimer());
 
-    // Keyboard shortcuts inside overlay
+    // Hotkeys inside overlay
     window.addEventListener('keydown', (e) => {
       if (!this.isVisible) return;
       if (e.key === 'Escape') {
@@ -172,8 +210,44 @@ class LyricsOverlay {
         this.onTogglePlay();
       } else if (e.key === 'f' || e.key === 'F') {
         this.toggleFullscreen();
+      } else if (e.key === 'v' || e.key === 'V') {
+        this.toggleDisplayMode();
       }
     });
+  }
+
+  setVibe(vibe) {
+    this.currentVibe = vibe;
+    this.root.className = `cl-visible cl-vibe-${vibe}`;
+
+    this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.vibe === vibe);
+    });
+
+    // If waterfall was chosen, switch to waterfall mode
+    if (vibe === 'waterfall') {
+      this.setDisplayMode('waterfall');
+    }
+  }
+
+  toggleDisplayMode() {
+    this.setDisplayMode(this.displayMode === 'hero' ? 'waterfall' : 'hero');
+  }
+
+  setDisplayMode(mode) {
+    this.displayMode = mode;
+    if (mode === 'hero') {
+      this.heroStage.style.display = 'flex';
+      this.lyricsContainer.style.display = 'none';
+      this.modeIcon.textContent = '🎯';
+      this.modeText.textContent = 'Word Hero';
+    } else {
+      this.heroStage.style.display = 'none';
+      this.lyricsContainer.style.display = 'flex';
+      this.modeIcon.textContent = '📜';
+      this.modeText.textContent = 'Waterfall';
+      this.scrollToActiveLine(false);
+    }
   }
 
   resetIdleTimer() {
@@ -192,7 +266,9 @@ class LyricsOverlay {
     this.isVisible = true;
     this.root.classList.add('cl-visible');
     this.resetIdleTimer();
-    this.scrollToActiveLine(false);
+    if (this.displayMode === 'waterfall') {
+      this.scrollToActiveLine(false);
+    }
   }
 
   hide() {
@@ -219,23 +295,6 @@ class LyricsOverlay {
     }
   }
 
-  cycleTheme() {
-    const themes = ['pure-black', 'ambient', 'neon'];
-    const names = {
-      'pure-black': 'Pitch Black',
-      'ambient': 'Aurora Glow',
-      'neon': 'Cyber Neon'
-    };
-    const nextIdx = (themes.indexOf(this.theme) + 1) % themes.length;
-    this.theme = themes[nextIdx];
-
-    this.root.classList.remove('cl-theme-ambient', 'cl-theme-neon');
-    if (this.theme === 'ambient') this.root.classList.add('cl-theme-ambient');
-    if (this.theme === 'neon') this.root.classList.add('cl-theme-neon');
-
-    this.themeName.textContent = names[this.theme];
-  }
-
   adjustOffset(delta) {
     this.setOffset(Math.round((this.userOffset + delta) * 10) / 10);
   }
@@ -243,7 +302,7 @@ class LyricsOverlay {
   setOffset(val) {
     this.userOffset = val;
     this.offsetVal.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}s`;
-    this.offsetVal.style.color = val === 0 ? 'rgba(255,255,255,0.6)' : '#00f0ff';
+    this.offsetVal.style.color = val === 0 ? 'rgba(255,255,255,0.6)' : 'var(--cl-accent)';
   }
 
   updateTrackInfo(track) {
@@ -261,17 +320,29 @@ class LyricsOverlay {
     }
 
     this.durationEl.textContent = LrcParser.formatTime(track.duration || 0);
+
+    // Auto-detect genre vibe
+    if (typeof GenreDetector !== 'undefined') {
+      const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
+      this.setVibe(autoVibe);
+    }
   }
 
   updateLyrics(lyricsResult) {
     this.lyricsData = lyricsResult;
     this.lyricsContainer.innerHTML = '';
     this.activeLineIndex = -1;
+    this.currentHeroWord = '';
 
     if (!lyricsResult || !lyricsResult.lines || lyricsResult.lines.length === 0) {
       const msg = lyricsResult && lyricsResult.instrumental
         ? '♪ Instrumental Track ♪'
-        : 'No synchronized lyrics found for this song';
+        : 'No synchronized lyrics found';
+      
+      this.heroWordEl.textContent = msg;
+      this.heroLineTrackEl.innerHTML = '';
+      this.heroUpcomingEl.textContent = 'Enjoy the rhythm';
+
       this.lyricsContainer.innerHTML = `
         <div class="cl-status-view">
           <span style="font-size: 2rem;">✨</span>
@@ -281,6 +352,7 @@ class LyricsOverlay {
       return;
     }
 
+    // Populate waterfall list
     const fragment = document.createDocumentFragment();
     lyricsResult.lines.forEach((line, idx) => {
       const lineEl = document.createElement('div');
@@ -289,7 +361,6 @@ class LyricsOverlay {
       lineEl.dataset.time = line.time.toString();
       lineEl.textContent = line.text;
 
-      // Click to seek to that line!
       lineEl.addEventListener('click', () => {
         this.onSeek(line.time);
       });
@@ -301,7 +372,6 @@ class LyricsOverlay {
   }
 
   updateProgress({ currentTime, duration, isPaused }) {
-    // Update labels and scrubber
     this.currentTimeEl.textContent = LrcParser.formatTime(currentTime || 0);
     if (duration > 0) {
       const pct = Math.min(100, Math.max(0, (currentTime / duration) * 100));
@@ -309,15 +379,62 @@ class LyricsOverlay {
       this.durationEl.textContent = LrcParser.formatTime(duration);
     }
 
-    // Play/Pause icon
     this.playBtn.textContent = isPaused ? '▶' : '⏸';
 
-    // Update active lyric line
     if (!this.lyricsData || !this.lyricsData.lines || !this.lyricsData.isSynced) return;
 
-    const newIndex = LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
+    // 1. Kinetic Word Hero update
+    const activeWordObj = LrcParser.getActiveWord(this.lyricsData.lines, currentTime, this.userOffset);
+    if (activeWordObj) {
+      this.updateHeroDisplay(activeWordObj);
+    }
+
+    // 2. Waterfall active line update
+    const newIndex = activeWordObj ? activeWordObj.lineIndex : LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
     if (newIndex !== this.activeLineIndex) {
       this.setActiveLine(newIndex);
+    }
+  }
+
+  updateHeroDisplay(activeWordObj) {
+    const rawWord = activeWordObj.currentWord.trim();
+    if (rawWord !== this.currentHeroWord) {
+      this.currentHeroWord = rawWord;
+      this.heroWordEl.textContent = rawWord;
+
+      // Retrigger slam animation
+      this.heroWordEl.classList.remove('cl-word-slam');
+      void this.heroWordEl.offsetWidth; // reflow
+      this.heroWordEl.classList.add('cl-word-slam');
+
+      // Pulse radial backdrop aura
+      if (this.radialGlow) {
+        this.radialGlow.classList.remove('cl-glow-pulse');
+        void this.radialGlow.offsetWidth;
+        this.radialGlow.classList.add('cl-glow-pulse');
+      }
+    }
+
+    // Render phrase tracker words
+    const line = this.lyricsData.lines[activeWordObj.lineIndex];
+    if (line && line.words) {
+      this.heroLineTrackEl.innerHTML = '';
+      line.words.forEach((w, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-track-word';
+        if (idx === activeWordObj.wordIndex) {
+          span.classList.add('active');
+        }
+        span.textContent = w.word;
+        this.heroLineTrackEl.appendChild(span);
+      });
+    }
+
+    // Render upcoming line preview
+    if (activeWordObj.nextLineText) {
+      this.heroUpcomingEl.textContent = `Next: "${activeWordObj.nextLineText}"`;
+    } else {
+      this.heroUpcomingEl.textContent = '';
     }
   }
 
@@ -331,7 +448,7 @@ class LyricsOverlay {
     const newLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${index}"]`);
     if (newLine) {
       newLine.classList.add('cl-active');
-      if (!this.isUserScrolling) {
+      if (this.displayMode === 'waterfall' && !this.isUserScrolling) {
         this.scrollToActiveLine(true);
       }
     }

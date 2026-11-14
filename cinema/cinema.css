@@ -1,13 +1,16 @@
-/* Cool Lyrics - Cinema Standalone Mode Styling */
+/* Cool Lyrics - Cinema Standalone Artistic Mode Styling */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@400;700;900&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&display=swap');
 
 :root {
   --bg-color: #000000;
   --text-active: #ffffff;
   --text-dimmed: rgba(255, 255, 255, 0.22);
   --text-hover: rgba(255, 255, 255, 0.7);
-  --accent-cyan: #00f0ff;
-  --accent-pink: #ec4899;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "SF Pro Display", sans-serif;
+  --accent-color: #00f0ff;
+  --glow-color: rgba(0, 240, 255, 0.55);
+  --font-display: 'Syne', 'Impact', -apple-system, sans-serif;
+  --font-body: 'Outfit', 'Inter', -apple-system, sans-serif;
 }
 
 * {
@@ -21,10 +24,44 @@ body, html {
   height: 100%;
   background-color: var(--bg-color);
   color: var(--text-active);
-  font-family: var(--font-family);
+  font-family: var(--font-body);
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ===================================================
+   GENRE / VIBE VARIATIONS
+   =================================================== */
+
+body.cl-vibe-kinetic {
+  --font-display: 'Syne', 'Impact', sans-serif;
+  --accent-color: #ff0055;
+  --glow-color: rgba(255, 0, 85, 0.5);
+}
+
+body.cl-vibe-cyber {
+  --font-display: 'Unbounded', 'Courier New', monospace;
+  --accent-color: #00f0ff;
+  --glow-color: rgba(0, 240, 255, 0.65);
+}
+
+body.cl-vibe-dreamwave {
+  --font-display: 'Outfit', sans-serif;
+  --accent-color: #c084fc;
+  --glow-color: rgba(192, 132, 252, 0.45);
+}
+
+body.cl-vibe-velvet {
+  --font-display: 'Cinzel Decorative', 'Georgia', serif;
+  --accent-color: #e2b170;
+  --glow-color: rgba(226, 177, 112, 0.4);
+}
+
+body.cl-vibe-waterfall {
+  --font-display: 'Outfit', -apple-system, sans-serif;
+  --accent-color: #ffffff;
+  --glow-color: rgba(255, 255, 255, 0.35);
 }
 
 .cl-cinema-root {
@@ -36,48 +73,38 @@ body, html {
   background-color: #000000;
 }
 
-/* Ambient Aura Glow Layer */
+/* Backdrop Radial Glow */
 .cl-aura-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
-  opacity: 0;
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.cl-theme-aurora .cl-aura-bg {
-  opacity: 0.16;
-}
-
-.cl-glow-orb {
+.cl-radial-glow {
   position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 75vw;
+  height: 75vw;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  filter: blur(140px);
+  filter: blur(150px);
+  background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 65%);
+  opacity: 0.32;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }
 
-.cl-orb-1 {
-  width: 50vw;
-  height: 50vw;
-  top: 10%;
-  left: 15%;
-  background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
-  animation: orb-drift 20s infinite alternate ease-in-out;
+.cl-glow-pulse {
+  animation: aura-beat 0.45s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
-.cl-orb-2 {
-  width: 45vw;
-  height: 45vw;
-  bottom: 10%;
-  right: 15%;
-  background: radial-gradient(circle, var(--accent-pink), transparent 70%);
-  animation: orb-drift 18s infinite alternate-reverse ease-in-out;
-}
-
-@keyframes orb-drift {
-  0% { transform: translate(-10%, -10%) scale(0.9); }
-  100% { transform: translate(15%, 15%) scale(1.15); }
+@keyframes aura-beat {
+  0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.25; }
+  50% { transform: translate(-50%, -50%) scale(1.18); opacity: 0.65; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.32; }
 }
 
 /* Top Navigation Bar */
@@ -108,6 +135,7 @@ body, html {
 }
 
 .cl-badge {
+  font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -127,33 +155,62 @@ body, html {
 .cl-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-.cl-theme-selector {
+/* Vibe Selector */
+.cl-vibe-selector {
   display: flex;
   background: rgba(255, 255, 255, 0.06);
   padding: 3px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
 }
 
 .cl-pill-btn {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
   font-weight: 600;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cl-pill-btn:hover {
+  color: #ffffff;
 }
 
 .cl-pill-btn.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.cl-mode-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.cl-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
 .cl-icon-btn {
@@ -175,7 +232,101 @@ body, html {
   transform: scale(1.05);
 }
 
-/* Stage & Lyrics */
+/* ===================================================
+   STAGE 1: KINETIC WORD HERO MODE
+   =================================================== */
+
+.cl-hero-stage {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6vw;
+  text-align: center;
+  overflow: hidden;
+}
+
+.cl-hero-word-box {
+  position: relative;
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cl-hero-word {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 12vw, 13rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 0 35px var(--glow-color), 0 0 95px var(--glow-color);
+  word-break: break-word;
+  transition: color 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.cl-word-slam {
+  animation: word-punch 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes word-punch {
+  0% { transform: scale(0.82) translateY(12px); opacity: 0.4; }
+  60% { transform: scale(1.04) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.cl-hero-context {
+  margin-top: 38px;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.cl-hero-line-track {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cl-track-word {
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.cl-track-word.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  text-shadow: 0 0 12px var(--glow-color);
+  font-weight: 800;
+}
+
+.cl-hero-upcoming {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.28);
+  font-style: italic;
+}
+
+/* ===================================================
+   STAGE 2: WATERFALL SCROLL
+   =================================================== */
+
 .cl-stage {
   position: relative;
   z-index: 10;
@@ -185,7 +336,7 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 42vh 8vw 42vh 8vw;
+  padding: 42vh 8vw;
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
@@ -199,16 +350,17 @@ body, html {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 950px;
+  max-width: 980px;
 }
 
 .cl-line-item {
   margin: 18px 0;
   padding: 12px 28px;
   border-radius: 18px;
+  font-family: var(--font-display);
   font-size: 2.3rem;
-  line-height: 1.4;
-  font-weight: 600;
+  line-height: 1.35;
+  font-weight: 700;
   letter-spacing: -0.02em;
   text-align: center;
   color: var(--text-dimmed);
@@ -227,17 +379,11 @@ body, html {
 
 .cl-line-item.active {
   color: #ffffff;
-  font-size: 2.75rem;
-  font-weight: 800;
+  font-size: 2.85rem;
+  font-weight: 900;
   filter: blur(0);
   transform: scale(1.06);
-  text-shadow: 0 0 28px rgba(255, 255, 255, 0.4);
-}
-
-/* Theme: Cyber Neon */
-.cl-theme-neon .cl-line-item.active {
-  color: var(--accent-cyan);
-  text-shadow: 0 0 14px rgba(0, 240, 255, 0.9), 0 0 45px rgba(0, 240, 255, 0.5);
+  text-shadow: 0 0 35px var(--glow-color);
 }
 
 /* Empty State */
@@ -254,7 +400,7 @@ body, html {
   width: 52px;
   height: 52px;
   border: 3px solid rgba(255, 255, 255, 0.12);
-  border-top-color: var(--accent-cyan);
+  border-top-color: var(--accent-color);
   border-radius: 50%;
   animation: spin 1s infinite linear;
 }
@@ -309,7 +455,7 @@ body, html {
 .cl-dock-art {
   width: 50px;
   height: 50px;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
   background: #111;
   box-shadow: 0 6px 18px rgba(0,0,0,0.8);
@@ -322,6 +468,7 @@ body, html {
 }
 
 .cl-dock-title {
+  font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;
@@ -413,15 +560,11 @@ body, html {
 
 .cl-scrubber-fill {
   height: 100%;
-  background: #ffffff;
+  background: var(--accent-color);
+  box-shadow: 0 0 10px var(--glow-color);
   border-radius: 999px;
   width: 0%;
   transition: width 0.1s linear;
-}
-
-.cl-theme-neon .cl-scrubber-fill {
-  background: var(--accent-cyan);
-  box-shadow: 0 0 10px var(--accent-cyan);
 }
 
 .cl-dock-tools {

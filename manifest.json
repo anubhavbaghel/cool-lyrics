@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Cool Lyrics - Pitch Black Synchronized Lyrics",
-  "version": "1.0.0",
-  "description": "Cinematic pitch-black synchronized lyrics for Spotify, YouTube Music, and YouTube.",
+  "version": "1.1.0",
+  "description": "Artistic, pitch-black kinetic synchronized lyrics for Spotify, YouTube Music, and YouTube.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -30,6 +30,9 @@
     "*://www.youtube.com/*",
     "https://lrclib.net/*"
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -39,6 +42,7 @@
       ],
       "js": [
         "utils/title-cleaner.js",
+        "utils/genre-detector.js",
         "utils/lrc-parser.js",
         "utils/lyrics-api.js",
         "content/overlay.js",
@@ -54,7 +58,8 @@
     {
       "resources": [
         "icons/*",
-        "cinema/*"
+        "cinema/*",
+        "utils/*"
       ],
       "matches": [
         "*://open.spotify.com/*",

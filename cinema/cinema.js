@@ -1,5 +1,5 @@
 /**
- * Cool Lyrics - Dedicated Standalone Cinema Mode
+ * Cool Lyrics - Dedicated Standalone Artistic Cinema Mode
  */
 
 (function () {
@@ -7,13 +7,23 @@
   let currentTrack = null;
   let lyricsData = null;
   let activeIndex = -1;
+  let currentHeroWord = '';
   let userOffset = 0;
-  let currentTheme = 'pure';
+  
+  let currentVibe = 'kinetic';
+  let displayMode = 'hero'; // 'hero' or 'waterfall'
+
   let isUserScrolling = false;
   let scrollResumeTimer = null;
   let idleTimer = null;
 
   // DOM Elements
+  const heroStage = document.getElementById('cinema-hero-stage');
+  const heroWordEl = document.getElementById('cinema-hero-word');
+  const heroLineTrackEl = document.getElementById('cinema-hero-line-track');
+  const heroUpcomingEl = document.getElementById('cinema-hero-upcoming');
+  const radialGlow = document.getElementById('cinema-radial-glow');
+
   const stage = document.getElementById('lyrics-stage');
   const linesWrapper = document.getElementById('lines-wrapper');
   const emptyState = document.getElementById('empty-state');
@@ -35,6 +45,10 @@
   const playIcon = document.getElementById('play-icon');
   const btnFullscreen = document.getElementById('btn-fullscreen');
 
+  const btnModeToggle = document.getElementById('btn-mode-toggle');
+  const cinemaModeIcon = document.getElementById('cinema-mode-icon');
+  const cinemaModeLabel = document.getElementById('cinema-mode-label');
+
   const syncMinus = document.getElementById('sync-minus');
   const syncPlus = document.getElementById('sync-plus');
   const syncReset = document.getElementById('sync-reset');
@@ -48,20 +62,23 @@
   }
 
   function bindEvents() {
-    // Theme switching
+    // Vibe switching
     document.querySelectorAll('.cl-pill-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.cl-pill-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        setTheme(btn.dataset.theme);
+        setVibe(btn.dataset.vibe);
       });
     });
+
+    // Display mode toggle (Hero vs Waterfall)
+    btnModeToggle.addEventListener('click', toggleDisplayMode);
 
     // Fullscreen
     btnFullscreen.addEventListener('click', toggleFullscreen);
     window.addEventListener('keydown', (e) => {
       if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen();
+      } else if (e.key === 'v' || e.key === 'V') {
+        toggleDisplayMode();
       } else if (e.key === ' ' && e.target === document.body) {
         e.preventDefault();
         sendMediaAction('TOGGLE_PLAY');
@@ -111,9 +128,37 @@
     }, 3000);
   }
 
-  function setTheme(theme) {
-    currentTheme = theme;
-    document.body.className = `cl-theme-${theme}`;
+  function setVibe(vibe) {
+    currentVibe = vibe;
+    document.body.className = `cl-vibe-${vibe}`;
+
+    document.querySelectorAll('.cl-pill-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.vibe === vibe);
+    });
+
+    if (vibe === 'waterfall') {
+      setDisplayMode('waterfall');
+    }
+  }
+
+  function toggleDisplayMode() {
+    setDisplayMode(displayMode === 'hero' ? 'waterfall' : 'hero');
+  }
+
+  function setDisplayMode(mode) {
+    displayMode = mode;
+    if (mode === 'hero') {
+      heroStage.style.display = 'flex';
+      stage.style.display = 'none';
+      cinemaModeIcon.textContent = '🎯';
+      cinemaModeLabel.textContent = 'Word Hero';
+    } else {
+      heroStage.style.display = 'none';
+      stage.style.display = 'flex';
+      cinemaModeIcon.textContent = '📜';
+      cinemaModeLabel.textContent = 'Waterfall';
+      scrollToActive(false);
+    }
   }
 
   function toggleFullscreen() {
@@ -131,7 +176,7 @@
   function setOffset(val) {
     userOffset = val;
     syncVal.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}s`;
-    syncVal.style.color = val === 0 ? 'rgba(255,255,255,0.7)' : '#00f0ff';
+    syncVal.style.color = val === 0 ? 'rgba(255,255,255,0.7)' : 'var(--accent-color)';
   }
 
   function requestInitialState() {
@@ -162,6 +207,12 @@
       dockArt.src = track.artwork;
     }
 
+    // Auto-detect vibe
+    if (typeof GenreDetector !== 'undefined') {
+      const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
+      setVibe(autoVibe);
+    }
+
     if (lyrics) {
       lyricsData = lyrics;
       renderLyrics(lyrics);
@@ -175,6 +226,7 @@
     emptyState.querySelector('.cl-empty-title').textContent = 'Searching lyrics...';
     emptyState.querySelector('.cl-empty-subtitle').textContent = `${track.title} • ${track.artist}`;
     linesWrapper.innerHTML = '';
+    heroWordEl.textContent = '...';
 
     try {
       const res = await LyricsAPI.fetchLyrics({
@@ -200,13 +252,19 @@
   function renderLyrics(data) {
     linesWrapper.innerHTML = '';
     activeIndex = -1;
+    currentHeroWord = '';
 
     if (!data || !data.lines || data.lines.length === 0) {
-      emptyState.style.display = 'flex';
-      emptyState.querySelector('.cl-empty-title').textContent = data && data.instrumental
+      const msg = data && data.instrumental
         ? '♪ Instrumental Track ♪'
         : 'No lyrics available';
+      emptyState.style.display = 'flex';
+      emptyState.querySelector('.cl-empty-title').textContent = msg;
       emptyState.querySelector('.cl-empty-subtitle').textContent = 'Enjoy the rhythm';
+
+      heroWordEl.textContent = msg;
+      heroLineTrackEl.innerHTML = '';
+      heroUpcomingEl.textContent = '';
       return;
     }
 
@@ -247,12 +305,55 @@
       playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
     }
 
-    // Synced lyrics highlight
-    if (lyricsData && lyricsData.lines && lyricsData.isSynced) {
-      const idx = LrcParser.getActiveIndex(lyricsData.lines, state.currentTime, userOffset);
-      if (idx !== activeIndex) {
-        setActiveLine(idx);
+    if (!lyricsData || !lyricsData.lines || !lyricsData.isSynced) return;
+
+    // 1. Kinetic Word Hero update
+    const wordObj = LrcParser.getActiveWord(lyricsData.lines, state.currentTime, userOffset);
+    if (wordObj) {
+      updateHeroWord(wordObj);
+    }
+
+    // 2. Waterfall active line update
+    const idx = wordObj ? wordObj.lineIndex : LrcParser.getActiveIndex(lyricsData.lines, state.currentTime, userOffset);
+    if (idx !== activeIndex) {
+      setActiveLine(idx);
+    }
+  }
+
+  function updateHeroWord(wordObj) {
+    const raw = wordObj.currentWord.trim();
+    if (raw !== currentHeroWord) {
+      currentHeroWord = raw;
+      heroWordEl.textContent = raw;
+
+      heroWordEl.classList.remove('cl-word-slam');
+      void heroWordEl.offsetWidth;
+      heroWordEl.classList.add('cl-word-slam');
+
+      if (radialGlow) {
+        radialGlow.classList.remove('cl-glow-pulse');
+        void radialGlow.offsetWidth;
+        radialGlow.classList.add('cl-glow-pulse');
       }
+    }
+
+    // Line track
+    const line = lyricsData.lines[wordObj.lineIndex];
+    if (line && line.words) {
+      heroLineTrackEl.innerHTML = '';
+      line.words.forEach((w, i) => {
+        const span = document.createElement('span');
+        span.className = 'cl-track-word';
+        if (i === wordObj.wordIndex) span.classList.add('active');
+        span.textContent = w.word;
+        heroLineTrackEl.appendChild(span);
+      });
+    }
+
+    if (wordObj.nextLineText) {
+      heroUpcomingEl.textContent = `Next: "${wordObj.nextLineText}"`;
+    } else {
+      heroUpcomingEl.textContent = '';
     }
   }
 
@@ -266,7 +367,7 @@
     const newEl = linesWrapper.querySelector(`.cl-line-item[data-index="${idx}"]`);
     if (newEl) {
       newEl.classList.add('active');
-      if (!isUserScrolling) {
+      if (displayMode === 'waterfall' && !isUserScrolling) {
         scrollToActive(true);
       }
     }
