@@ -1,15 +1,19 @@
-/* Cool Lyrics - Cinema Standalone Systematic Constellation Scatter Styling */
+/* Cool Lyrics - Cinema Standalone Instagram Story Bouncy Lyrics Styling */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --bg-color: #000000;
   --text-active: #ffffff;
+  --text-idle: rgba(255, 255, 255, 0.72);
+  --text-prev: rgba(255, 255, 255, 0.22);
+  --text-next: rgba(255, 255, 255, 0.22);
   --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.55);
-  --pill-bg: rgba(0, 240, 255, 0.14);
+  --glow-color: rgba(0, 240, 255, 0.5);
+  --highlight-bg: rgba(255, 255, 255, 0.14);
   --font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --skew: 0deg;
 }
 
 * {
@@ -30,34 +34,41 @@ body, html {
 }
 
 /* ===================================================
-   GENRE / VIBE PERSONALITIES
+   GENRE / VIBE THEMES
    =================================================== */
 
-/* 1. 📸 Insta Reel */
+/* 1. 📸 Insta Bouncy */
 body.cl-vibe-reel {
   --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.5);
-  --pill-bg: rgba(0, 240, 255, 0.16);
+  --glow-color: rgba(0, 240, 255, 0.45);
+  --highlight-bg: rgba(0, 240, 255, 0.16);
+  --skew: 0deg;
 }
 
 /* 2. 💥 Street Drill */
 body.cl-vibe-slanted {
-  --font-lyric: 'Bebas Neue', 'Syne', 'Impact', sans-serif;
+  --font-lyric: 'Bebas Neue', 'Syne', sans-serif;
   --accent-color: #ff0055;
-  --glow-color: rgba(255, 0, 85, 0.65);
-  --pill-bg: rgba(255, 0, 85, 0.2);
+  --glow-color: rgba(255, 0, 85, 0.6);
+  --highlight-bg: rgba(255, 0, 85, 0.2);
+  --skew: -6deg;
+}
+
+body.cl-vibe-slanted .cl-bouncy-word {
+  letter-spacing: 0.03em;
 }
 
 /* 3. 🍷 Editorial Vinyl */
 body.cl-vibe-editorial {
-  --font-lyric: 'Playfair Display', 'Georgia', serif;
+  --font-lyric: 'Playfair Display', serif;
   --accent-color: #fbbf24;
   --glow-color: rgba(251, 191, 36, 0.45);
-  --pill-bg: rgba(251, 191, 36, 0.14);
+  --highlight-bg: rgba(251, 191, 36, 0.15);
+  --skew: 0deg;
 }
 
-body.cl-vibe-editorial .cl-scatter-word.age-0 {
+body.cl-vibe-editorial .cl-bouncy-word.active {
   font-style: italic;
 }
 
@@ -66,15 +77,17 @@ body.cl-vibe-cyber {
   --font-lyric: 'Space Grotesk', monospace;
   --accent-color: #10b981;
   --glow-color: rgba(16, 185, 129, 0.55);
-  --pill-bg: rgba(16, 185, 129, 0.16);
+  --highlight-bg: rgba(16, 185, 129, 0.16);
+  --skew: 0deg;
 }
 
-/* 5. 📜 Minimal Studio */
+/* 5. 📜 Pure Studio */
 body.cl-vibe-classic {
-  --font-lyric: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #ffffff;
   --glow-color: rgba(255, 255, 255, 0.3);
-  --pill-bg: rgba(255, 255, 255, 0.1);
+  --highlight-bg: rgba(255, 255, 255, 0.1);
+  --skew: 0deg;
 }
 
 .cl-cinema-root {
@@ -97,25 +110,27 @@ body.cl-vibe-classic {
 
 .cl-radial-glow {
   position: absolute;
-  width: 60vw;
-  height: 60vw;
+  top: 50%;
+  left: 50%;
+  width: 65vw;
+  height: 65vw;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   filter: blur(150px);
   background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 65%);
-  opacity: 0.32;
-  transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1), top 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-  will-change: left, top, opacity;
+  opacity: 0.28;
+  transition: opacity 0.5s ease;
+  will-change: transform, opacity;
 }
 
 .cl-glow-pulse {
-  animation: aura-beat 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+  animation: aura-beat 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
 @keyframes aura-beat {
-  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.2; }
-  50% { transform: translate(-50%, -50%) scale(1.14); opacity: 0.58; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.32; }
+  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.22; }
+  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.28; }
 }
 
 /* Top Navigation Bar */
@@ -241,150 +256,130 @@ body.cl-vibe-classic {
 }
 
 /* ===================================================
-   SYSTEMATIC CONSTELLATION SCATTER STAGE
+   INSTAGRAM STORY BOUNCY STAGE
    =================================================== */
 
-.cl-constellation-stage {
-  position: absolute;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+.cl-bouncy-stage {
+  position: relative;
   z-index: 10;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.cl-scatter-word {
-  position: absolute;
-  transform-origin: center;
-  pointer-events: auto;
-  cursor: pointer;
-  font-family: var(--font-lyric);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  padding: 8px 20px;
-  border-radius: 18px;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.8s ease;
-  will-change: transform, opacity, filter;
-}
-
-/* Age 0: Newest Active Word */
-.cl-scatter-word.age-0 {
-  font-size: clamp(3.4rem, 6.5vw, 6.8rem);
-  font-weight: 900;
-  color: #ffffff;
-  opacity: 1;
-  z-index: 25;
-  background: var(--pill-bg);
-  box-shadow: 0 0 38px var(--glow-color), 0 0 80px var(--glow-color);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: scatter-bloom 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-@keyframes scatter-bloom {
-  0% { transform: scale(0.7) translateY(14px); opacity: 0.2; }
-  60% { transform: scale(1.08) translateY(-2px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-/* Age 1 */
-.cl-scatter-word.age-1 {
-  font-size: clamp(2.9rem, 5.4vw, 5.6rem);
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.82);
-  opacity: 0.78;
-  z-index: 20;
-  background: transparent;
-  box-shadow: none;
-  border: 1px solid transparent;
-}
-
-/* Age 2 */
-.cl-scatter-word.age-2 {
-  font-size: clamp(2.5rem, 4.6vw, 4.8rem);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.58);
-  opacity: 0.52;
-  z-index: 15;
-}
-
-/* Age 3 */
-.cl-scatter-word.age-3 {
-  font-size: clamp(2.2rem, 4.0vw, 4.2rem);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.38);
-  opacity: 0.30;
-  filter: blur(0.6px);
-  z-index: 10;
-}
-
-/* Age 4 */
-.cl-scatter-word.age-4 {
-  font-size: clamp(1.9rem, 3.4vw, 3.5rem);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.22);
-  opacity: 0.14;
-  filter: blur(1.5px);
-  z-index: 5;
-}
-
-/* Age 5 */
-.cl-scatter-word.age-5 {
-  opacity: 0;
-  filter: blur(3px);
-  transform: scale(0.92);
-  z-index: 1;
-}
-
-.cl-scatter-word:hover {
-  opacity: 1 !important;
-  color: #ffffff !important;
-  filter: blur(0) !important;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* Minimal sentence banner at bottom center for linear context */
-.cl-sentence-subbar {
-  position: absolute;
-  bottom: 84px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 6px 18px;
-  background: rgba(15, 15, 20, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  backdrop-filter: blur(16px);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  max-width: 80vw;
-  white-space: nowrap;
+  justify-content: center;
+  padding: 0 8vw;
+  text-align: center;
   overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
 }
 
-.cl-sentence-badge {
-  font-size: 0.7rem;
+.cl-bouncy-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  transform: skewX(var(--skew));
+  transition: transform 0.35s ease;
+}
+
+.cl-bouncy-prev {
+  font-family: var(--font-lyric);
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-prev);
+  filter: blur(1px);
+  transform: translateY(-8px);
+  opacity: 0.45;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 950px;
+}
+
+.cl-bouncy-active {
+  font-family: var(--font-lyric);
+  font-size: clamp(2.8rem, 5.5vw, 5.2rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  background: var(--pill-bg);
-  color: var(--accent-color);
-  border-radius: 999px;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px 20px;
+  max-width: 1150px;
+  padding: 14px 24px;
+  border-radius: 28px;
+  transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.cl-line-slide-in {
+  animation: line-rise 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes line-rise {
+  0% { transform: translateY(28px) scale(0.95); opacity: 0.3; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.cl-bouncy-word {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  color: var(--text-idle);
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), background 0.25s ease;
+  will-change: transform, color;
+}
+
+.cl-bouncy-word.active {
+  color: #ffffff;
+  background: var(--highlight-bg);
+  box-shadow: 0 0 30px var(--glow-color), 0 0 60px var(--glow-color);
+  font-weight: 900;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: insta-word-pop 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes insta-word-pop {
+  0% { transform: scale(0.90) translateY(4px); }
+  50% { transform: scale(1.15) translateY(-2px); }
+  100% { transform: scale(1.08) translateY(0); }
+}
+
+.cl-bouncy-word.passed {
+  color: rgba(255, 255, 255, 0.88);
+  transform: scale(1);
+}
+
+.cl-bouncy-word.upcoming {
+  color: rgba(255, 255, 255, 0.55);
+  transform: scale(1);
+}
+
+.cl-bouncy-word:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.cl-bouncy-next {
+  font-family: var(--font-lyric);
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-next);
+  filter: blur(1px);
+  transform: translateY(8px);
+  opacity: 0.45;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 950px;
 }
 
 /* ===================================================
-   STAGE 2: WATERFALL SCROLL
+   WATERFALL SCROLL
    =================================================== */
 
 .cl-stage {

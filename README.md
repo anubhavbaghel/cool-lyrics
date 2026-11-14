@@ -1,39 +1,32 @@
-# 🎤 Cool Lyrics (v1.3)
-> **Cinematic, Full-Screen Systematic Constellation & Pitch-Black Synchronized Lyrics for Chrome**
+# 🎤 Cool Lyrics (v1.4)
+> **Cinematic, Instagram Story Bouncy Synchronized Lyrics for Chrome**
 
-**Cool Lyrics** turns your web music experience into a full-screen, OLED typographic constellation. It utilizes the **entire screen** (`100vw x 100vh`) to display words in **systematically randomized spatial coordinates**, while smoothly fading older words into the pitch-black abyss as the song flows.
+**Cool Lyrics** turns your web music experience into a distraction-free, pitch-black visualizer inspired by **Instagram Story & Reel bouncy lyrics**. It displays full lyric phrases with **signature bouncy spring physics**, slide-up line transitions, and genre personalities on a pure `#000000` pitch-black canvas.
 
 ---
 
-## 🌌 The Constellation Scatter Experience
+## 📸 The Instagram Story Bouncy Experience
 
-### 1. 🪐 Full-Screen Systematic Spatial Distribution
-- **Utilizes the Complete Screen**: Instead of keeping lyrics locked in a central box, words materialize in organic spatial pockets across the entire screen.
-- **Systematic & Aesthetic Randomness**:
-  - Divided into 14 balanced spatial anchor zones that prevent awkward overlaps and keep safe distance from headers and controls.
-  - Organic human jitter (`±4%` X/Y drift, `±4°` tilt) makes every word feel naturally hand-placed like a living music poster.
-  - Non-repeating distribution guarantees a dynamic, breathing visual rhythm.
+### 1. 🦘 Signature Bouncy Word Spring (`insta-word-pop`)
+- The active phrase is front-and-center in bold, modern Instagram typography.
+- As the singer speaks each word, that specific word **bounces/springs forward** with organic spring elasticity (`scale(1.15)` overshoot -> settles at `1.08`), illuminated in white with a glowing highlight badge.
+- **Surrounding words remain fully legible** in the sentence, giving you complete musical context.
 
-### 2. ⏳ Lingering & Gradual Fade Trail
-- **Newest Active Word (Age 0)**: Bursts in with a blooming animation, brilliant `#ffffff` bold presence, neon glow halo, and a localized ambient radial backdrop aura.
-- **Gradual Word Aging**:
-  - **Age 1**: Drops to `78%` opacity, retaining crisp readability.
-  - **Age 2**: Softens to `52%` opacity.
-  - **Age 3**: Dissolves to `30%` opacity with a subtle dream blur.
-  - **Age 4**: Dims to a distant `14%` whisper.
-  - **Age 5**: Gracefully fades into pure `#000000` pitch black and cleans up.
-- Creates an **ethereal luminous trail** of the last 6–8 words across space so you always have musical context without screen clutter.
+### 2. 🚀 Rhythmic Slide-Up & Fade Line Transitions
+- When a phrase finishes, it **smoothly glides upward and fades out** into the dark void.
+- The new incoming phrase **rises up from below** (`line-rise` animation) with words springing in to the beat.
+- The upcoming phrase waits subtly below in dimmed text.
 
-### 3. 🎯 Click-to-Seek & Linear Reference
-- **Click Any Word**: Click any floating word anywhere on the screen to instantly jump the audio playback to that exact second.
-- **Context Subbar**: A minimalist pill at the bottom center displays the full current line so you can glance at the complete sentence anytime.
+### 3. 🖱️ Tactile Controls
+- **Click Any Word to Jump**: Click any word in the active phrase to seek audio playback directly to that second.
+- **Mode Toggle (`V`)**: Press `V` anytime to switch between **Instagram Bouncy Reel** and **Classic Waterfall Scroll**.
 
 ### 4. 🎭 Genre Personalities
-Switch vibes or let it auto-detect based on the playing track:
-- 📸 **Insta Reel** *(Pop / Anthem / Dance)*: Modern, buoyant *Plus Jakarta Sans* with cyan laser aura.
-- 💥 **Street Drill** *(Hip-Hop / Rap / Trap)*: Aggressive *Bebas Neue* & *Syne* with slanted kinetic punch and hot crimson glow.
-- 🍷 **Editorial Vinyl** *(Lo-Fi / R&B / Soul / Ballads)*: Elegant high-fashion italic *Playfair Display* with champagne gold aura.
-- ⚡ **Cyber Matrix** *(Synthwave / EDM / Electronic)*: Wide *Space Grotesk* tech monospace with matrix emerald pulse.
+Switch vibes manually or let it auto-match the playing song:
+- 📸 **Insta Reel** *(Pop / Modern Anthems)*: Clean, bouncy *Plus Jakarta Sans* with cyan laser glow.
+- 💥 **Street Drill** *(Hip-Hop / Rap / Drill)*: Slanted 6° aggressive punch (*Bebas Neue* & *Syne*) with hot crimson neon highlights.
+- 🍷 **Editorial Vinyl** *(Lo-Fi / R&B / Soul / Ballads)*: Elegant *Playfair Display* serif with italic word pop and champagne gold aura.
+- ⚡ **Cyber Matrix** *(Synthwave / EDM / Electronic)*: Wide futuristic *Space Grotesk* monospace with emerald matrix pulse.
 - 📜 **Pure Studio** *(Minimalist)*: Classic Apple Music-style vertical waterfall scroll.
 
 ---
@@ -57,11 +50,11 @@ Switch vibes or let it auto-detect based on the playing track:
 | --- | --- |
 | `Alt + L` | Toggle In-Page Pitch-Black Cinema Overlay |
 | `Alt + Shift + L` | Open Standalone Cinema Tab (Multi-monitor / TV) |
-| `V` | **Toggle Display Mode**: Constellation Scatter Canvas vs Waterfall Scroll |
+| `V` | **Toggle Display Mode**: Instagram Bouncy Reel vs Waterfall Scroll |
 | `F` | Toggle Fullscreen Mode |
 | `Space` | Play / Pause playback |
 | `Esc` | Close In-Page Cinema Overlay |
-| `Click on any floating word` | Jump / Seek playback directly to that word |
+| `Click on any word` | Jump / Seek playback directly to that word |
 | `Scroll Wheel` | Temporarily pause auto-scroll to browse |
 
 ---
@@ -79,8 +72,8 @@ cool-lyrics/
 │   └── lyrics-api.js        # LRCLIB API client with caching & fallback search
 ├── content/
 │   ├── content.js           # Multi-player monitor & scrubber controller
-│   ├── overlay.js           # Full-screen systematic constellation scatter & fading engine
-│   └── overlay.css          # Constellation styles, age fades, and glowing aura coordinates
+│   ├── overlay.js           # In-page Instagram Story bouncy lyric component
+│   └── overlay.css          # Bouncy spring keyframes, slide-up lines & OLED backdrop
 ├── cinema/
 │   ├── cinema.html          # Standalone theater mode for dual-monitor / TV
 │   ├── cinema.js            # Standalone state synchronization & controls

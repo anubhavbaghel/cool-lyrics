@@ -33,7 +33,7 @@
 
         <!-- Mode Toggle -->
         <button class="cl-mode-btn" id="btn-mode-toggle" title="Toggle Display Mode (V)">
-          <span id="cinema-mode-icon">🌌</span> <span id="cinema-mode-label">Scatter Canvas</span>
+          <span id="cinema-mode-icon">✨</span> <span id="cinema-mode-label">Bouncy Reel</span>
         </button>
 
         <button class="cl-icon-btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
@@ -44,14 +44,16 @@
       </div>
     </header>
 
-    <!-- Stage 1: Systematic Constellation Scatter Stage -->
-    <main class="cl-constellation-stage" id="cinema-constellation-stage"></main>
-
-    <!-- Bottom Linear Context Subbar -->
-    <div class="cl-sentence-subbar" id="cinema-sentence-subbar">
-      <span class="cl-sentence-badge">NOW</span>
-      <span id="cinema-subbar-text">Play a song to start lyrics</span>
-    </div>
+    <!-- Stage 1: Instagram Story Bouncy Lyrics Stage -->
+    <main class="cl-bouncy-stage" id="cinema-bouncy-stage">
+      <div class="cl-bouncy-wrapper">
+        <div class="cl-bouncy-prev" id="cinema-bouncy-prev"></div>
+        <div class="cl-bouncy-active" id="cinema-bouncy-active">
+          <span class="cl-bouncy-word active">READY</span>
+        </div>
+        <div class="cl-bouncy-next" id="cinema-bouncy-next"></div>
+      </div>
+    </main>
 
     <!-- Stage 2: Classic Waterfall Scroll Stage -->
     <main class="cl-stage" id="lyrics-stage" style="display: none;">

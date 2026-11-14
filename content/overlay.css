@@ -1,19 +1,19 @@
-/* Cool Lyrics - Systematic Constellation Scatter & Instagram Lyric Styling */
+/* Cool Lyrics - Instagram Story Bouncy Lyrics Styling */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --cl-bg: #000000;
   --cl-text-active: #ffffff;
-  --cl-text-passed: rgba(255, 255, 255, 0.82);
-  --cl-text-pending: rgba(255, 255, 255, 0.52);
-  --cl-text-context: rgba(255, 255, 255, 0.24);
+  --cl-text-idle: rgba(255, 255, 255, 0.72);
+  --cl-text-prev: rgba(255, 255, 255, 0.22);
+  --cl-text-next: rgba(255, 255, 255, 0.22);
   --cl-accent: #00f0ff;
-  --cl-glow: rgba(0, 240, 255, 0.55);
-  --cl-pill-bg: rgba(0, 240, 255, 0.14);
+  --cl-glow: rgba(0, 240, 255, 0.5);
+  --cl-highlight-bg: rgba(255, 255, 255, 0.14);
   --cl-font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --cl-font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  --cl-slant: 0deg;
+  --cl-skew: 0deg;
 }
 
 #cool-lyrics-root {
@@ -41,59 +41,63 @@
 }
 
 /* ===================================================
-   GENRE / VIBE PERSONALITIES
+   GENRE / VIBE THEMES (INSTAGRAM STICKER STYLES)
    =================================================== */
 
-/* 1. 📸 Insta Reel */
+/* 1. 📸 Insta Bouncy (Classic Clean Pop Reel) */
 #cool-lyrics-root.cl-vibe-reel {
   --cl-font-lyric: 'Plus Jakarta Sans', sans-serif;
   --cl-accent: #00f0ff;
-  --cl-glow: rgba(0, 240, 255, 0.5);
-  --cl-pill-bg: rgba(0, 240, 255, 0.16);
-  --cl-slant: 0deg;
+  --cl-glow: rgba(0, 240, 255, 0.45);
+  --cl-highlight-bg: rgba(0, 240, 255, 0.16);
+  --cl-skew: 0deg;
 }
 
-/* 2. 💥 Street Drill */
+/* 2. 💥 Street Drill (Rap / Drill Slanted Punch) */
 #cool-lyrics-root.cl-vibe-slanted {
-  --cl-font-lyric: 'Bebas Neue', 'Syne', 'Impact', sans-serif;
+  --cl-font-lyric: 'Bebas Neue', 'Syne', sans-serif;
   --cl-accent: #ff0055;
-  --cl-glow: rgba(255, 0, 85, 0.65);
-  --cl-pill-bg: rgba(255, 0, 85, 0.2);
-  --cl-slant: -6deg;
+  --cl-glow: rgba(255, 0, 85, 0.6);
+  --cl-highlight-bg: rgba(255, 0, 85, 0.2);
+  --cl-skew: -6deg;
 }
 
-/* 3. 🍷 Editorial Vinyl */
+#cool-lyrics-root.cl-vibe-slanted .cl-bouncy-word {
+  letter-spacing: 0.03em;
+}
+
+/* 3. 🍷 Editorial Vinyl (Soul / R&B / Ballads) */
 #cool-lyrics-root.cl-vibe-editorial {
-  --cl-font-lyric: 'Playfair Display', 'Georgia', serif;
+  --cl-font-lyric: 'Playfair Display', serif;
   --cl-accent: #fbbf24;
   --cl-glow: rgba(251, 191, 36, 0.45);
-  --cl-pill-bg: rgba(251, 191, 36, 0.14);
-  --cl-slant: 0deg;
+  --cl-highlight-bg: rgba(251, 191, 36, 0.15);
+  --cl-skew: 0deg;
 }
 
-#cool-lyrics-root.cl-vibe-editorial .cl-scatter-word.age-0 {
+#cool-lyrics-root.cl-vibe-editorial .cl-bouncy-word.active {
   font-style: italic;
 }
 
-/* 4. ⚡ Cyber Matrix */
+/* 4. ⚡ Cyber Matrix (EDM / Synth) */
 #cool-lyrics-root.cl-vibe-cyber {
   --cl-font-lyric: 'Space Grotesk', monospace;
   --cl-accent: #10b981;
   --cl-glow: rgba(16, 185, 129, 0.55);
-  --cl-pill-bg: rgba(16, 185, 129, 0.16);
-  --cl-slant: 0deg;
+  --cl-highlight-bg: rgba(16, 185, 129, 0.16);
+  --cl-skew: 0deg;
 }
 
 /* 5. 📜 Pure Studio */
 #cool-lyrics-root.cl-vibe-classic {
-  --cl-font-lyric: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --cl-font-lyric: 'Plus Jakarta Sans', sans-serif;
   --cl-accent: #ffffff;
   --cl-glow: rgba(255, 255, 255, 0.3);
-  --cl-pill-bg: rgba(255, 255, 255, 0.1);
-  --cl-slant: 0deg;
+  --cl-highlight-bg: rgba(255, 255, 255, 0.1);
+  --cl-skew: 0deg;
 }
 
-/* Background Canvas */
+/* Pitch Black Background Canvas */
 .cl-bg-layer {
   position: absolute;
   inset: 0;
@@ -102,22 +106,34 @@
   overflow: hidden;
 }
 
-/* Dynamic Radial Aura that tracks active word location */
+/* Soft Radial Backdrop Aura */
 .cl-bg-glow {
   position: absolute;
-  width: 55vw;
-  height: 55vw;
+  top: 50%;
+  left: 50%;
+  width: 65vw;
+  height: 65vw;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   filter: blur(140px);
   background: radial-gradient(circle, var(--cl-glow) 0%, rgba(0,0,0,0) 65%);
-  opacity: 0.32;
+  opacity: 0.28;
   pointer-events: none;
-  transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1), top 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-  will-change: left, top, opacity;
+  transition: opacity 0.5s ease;
+  will-change: transform, opacity;
 }
 
-/* Header */
+.cl-glow-pulse {
+  animation: cl-aura-beat 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+@keyframes cl-aura-beat {
+  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.22; }
+  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.28; }
+}
+
+/* Top Header */
 .cl-header {
   position: absolute;
   top: 0;
@@ -252,151 +268,139 @@
 }
 
 /* ===================================================
-   SYSTEMATIC CONSTELLATION SCATTER STAGE (Full-Screen)
+   INSTAGRAM STORY BOUNCY LYRIC STAGE
    =================================================== */
 
-.cl-constellation-stage {
-  position: absolute;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+.cl-bouncy-stage {
+  position: relative;
   z-index: 10;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-/* Floating Scatter Word */
-.cl-scatter-word {
-  position: absolute;
-  transform-origin: center;
-  pointer-events: auto;
-  cursor: pointer;
-  font-family: var(--cl-font-lyric);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  padding: 8px 18px;
-  border-radius: 18px;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.8s ease;
-  will-change: transform, opacity, filter;
-}
-
-/* Age 0: The NEWEST, ACTIVE word (Bright, Glowing, Punchy) */
-.cl-scatter-word.age-0 {
-  font-size: clamp(3.2rem, 6.2vw, 6.4rem);
-  font-weight: 900;
-  color: #ffffff;
-  opacity: 1;
-  z-index: 25;
-  background: var(--cl-pill-bg);
-  box-shadow: 0 0 35px var(--cl-glow), 0 0 75px var(--cl-glow);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: scatter-bloom 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-@keyframes scatter-bloom {
-  0% { transform: scale(0.7) translateY(14px); opacity: 0.2; }
-  60% { transform: scale(1.08) translateY(-2px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-/* Age 1: Just finished, still bright and distinct */
-.cl-scatter-word.age-1 {
-  font-size: clamp(2.8rem, 5.2vw, 5.4rem);
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.82);
-  opacity: 0.78;
-  z-index: 20;
-  background: transparent;
-  box-shadow: none;
-  border: 1px solid transparent;
-}
-
-/* Age 2: Fading smoothly */
-.cl-scatter-word.age-2 {
-  font-size: clamp(2.4rem, 4.4vw, 4.6rem);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.58);
-  opacity: 0.52;
-  z-index: 15;
-}
-
-/* Age 3: Distant memory trail */
-.cl-scatter-word.age-3 {
-  font-size: clamp(2.1rem, 3.8vw, 4.0rem);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.38);
-  opacity: 0.30;
-  filter: blur(0.6px);
-  z-index: 10;
-}
-
-/* Age 4: Soft whisper before disappearing */
-.cl-scatter-word.age-4 {
-  font-size: clamp(1.8rem, 3.2vw, 3.4rem);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.22);
-  opacity: 0.14;
-  filter: blur(1.5px);
-  z-index: 5;
-}
-
-/* Age 5: Dissolved into the dark abyss */
-.cl-scatter-word.age-5 {
-  opacity: 0;
-  filter: blur(3px);
-  transform: scale(0.92);
-  z-index: 1;
-}
-
-.cl-scatter-word:hover {
-  opacity: 1 !important;
-  color: #ffffff !important;
-  filter: blur(0) !important;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* Minimal sentence banner at bottom center for linear context */
-.cl-sentence-subbar {
-  position: absolute;
-  bottom: 84px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 6px 18px;
-  background: rgba(15, 15, 20, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  backdrop-filter: blur(16px);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  max-width: 80vw;
-  white-space: nowrap;
+  justify-content: center;
+  padding: 0 8vw;
+  text-align: center;
   overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
 }
 
-.cl-sentence-badge {
-  font-size: 0.7rem;
+.cl-bouncy-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  transform: skewX(var(--cl-skew));
+  transition: transform 0.35s ease;
+}
+
+/* Previous Line: Glides Up & Fades Out */
+.cl-bouncy-prev {
+  font-family: var(--cl-font-lyric);
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--cl-text-prev);
+  filter: blur(1px);
+  transform: translateY(-8px);
+  opacity: 0.45;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 900px;
+}
+
+/* Center Stage: Active Bouncy Line */
+.cl-bouncy-active {
+  font-family: var(--cl-font-lyric);
+  font-size: clamp(2.6rem, 5.2vw, 4.8rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  background: var(--cl-pill-bg);
-  color: var(--cl-accent);
-  border-radius: 999px;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 18px;
+  max-width: 1100px;
+  padding: 14px 24px;
+  border-radius: 28px;
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+/* Smooth Slide-In on New Line Arrival */
+.cl-line-slide-in {
+  animation: line-rise 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes line-rise {
+  0% { transform: translateY(28px) scale(0.95); opacity: 0.3; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* The Individual Words Inside the Active Line */
+.cl-bouncy-word {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  color: var(--cl-text-idle);
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), background 0.25s ease;
+  will-change: transform, color;
+}
+
+/* When the Singer sings this Word: The Signature Instagram Spring Pop */
+.cl-bouncy-word.active {
+  color: #ffffff;
+  background: var(--cl-highlight-bg);
+  box-shadow: 0 0 28px var(--cl-glow), 0 0 55px var(--cl-glow);
+  font-weight: 900;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: insta-word-pop 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes insta-word-pop {
+  0% { transform: scale(0.90) translateY(4px); }
+  50% { transform: scale(1.15) translateY(-2px); }
+  100% { transform: scale(1.08) translateY(0); }
+}
+
+/* Words that have already passed in the phrase */
+.cl-bouncy-word.passed {
+  color: rgba(255, 255, 255, 0.88);
+  transform: scale(1);
+}
+
+/* Upcoming words in the line */
+.cl-bouncy-word.upcoming {
+  color: rgba(255, 255, 255, 0.55);
+  transform: scale(1);
+}
+
+.cl-bouncy-word:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* Upcoming Line: Waiting Below */
+.cl-bouncy-next {
+  font-family: var(--cl-font-lyric);
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--cl-text-next);
+  filter: blur(1px);
+  transform: translateY(8px);
+  opacity: 0.45;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 900px;
 }
 
 /* ===================================================
-   CLASSIC WATERFALL SCROLL STAGE
+   WATERFALL SCROLL STAGE
    =================================================== */
 
 .cl-lyrics-container {
@@ -488,7 +492,7 @@
   flex-direction: column;
   align-items: center;
   padding: 16px 36px 24px 36px;
-  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 60%, transparent 100%);
   gap: 12px;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }

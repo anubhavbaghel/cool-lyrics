@@ -1,6 +1,6 @@
 /**
- * Cool Lyrics - In-Page Systematic Constellation Scatter & Cinema Overlay
- * Spreads words across the screen systematically while smoothly fading older words.
+ * Cool Lyrics - Instagram Story Bouncy Lyrics Overlay Component
+ * Features rhythmic phrase slide-up, bouncy spring word highlights, and full context.
  */
 
 class LyricsOverlay {
@@ -16,16 +16,10 @@ class LyricsOverlay {
     this.lyricsData = null;
     this.activeLineIndex = -1;
     this.activeWordIndex = -1;
-    this.currentWordText = '';
     this.userOffset = 0;
     
-    this.displayMode = 'scatter'; // 'scatter' (Constellation Canvas) or 'waterfall' (Classic Scroll)
-    this.currentVibe = 'reel';    // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
-    
-    // Constellation history: array of { el, word, time, age, zoneIdx }
-    this.scatterWords = [];
-    this.lastZoneIndices = [];
-    this.MAX_ACTIVE_WORDS = 7;
+    this.displayMode = 'bouncy'; // 'bouncy' (Instagram Story) or 'waterfall' (Classic Scroll)
+    this.currentVibe = 'reel';   // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
 
     this.idleTimer = null;
     this.isUserScrolling = false;
@@ -66,7 +60,7 @@ class LyricsOverlay {
           </div>
 
           <button class="cl-btn" id="cl-btn-mode" title="Toggle Display Mode (V)">
-            <span id="cl-mode-icon">🌌</span> <span id="cl-mode-text">Scatter Canvas</span>
+            <span id="cl-mode-icon">✨</span> <span id="cl-mode-text">Bouncy Reel</span>
           </button>
           <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Standalone Window">
             <span>⧉</span>
@@ -80,14 +74,16 @@ class LyricsOverlay {
         </div>
       </header>
 
-      <!-- Stage 1: Systematic Constellation Scatter Stage -->
-      <main class="cl-constellation-stage" id="cl-constellation-stage"></main>
-
-      <!-- Bottom Linear Context Subbar -->
-      <div class="cl-sentence-subbar" id="cl-sentence-subbar">
-        <span class="cl-sentence-badge">NOW</span>
-        <span id="cl-subbar-text">Play a song to start lyrics</span>
-      </div>
+      <!-- Stage 1: Instagram Story Bouncy Lyrics Stage -->
+      <main class="cl-bouncy-stage" id="cl-bouncy-stage">
+        <div class="cl-bouncy-wrapper">
+          <div class="cl-bouncy-prev" id="cl-bouncy-prev"></div>
+          <div class="cl-bouncy-active" id="cl-bouncy-active">
+            <span class="cl-bouncy-word active">READY</span>
+          </div>
+          <div class="cl-bouncy-next" id="cl-bouncy-next"></div>
+        </div>
+      </main>
 
       <!-- Stage 2: Classic Waterfall Scroll Container -->
       <main class="cl-lyrics-container" id="cl-lyrics-scroll" style="display: none;">
@@ -135,9 +131,10 @@ class LyricsOverlay {
     // Elements
     this.header = root.querySelector('.cl-header');
     this.footer = root.querySelector('.cl-footer');
-    this.constellationStage = root.querySelector('#cl-constellation-stage');
-    this.sentenceSubbar = root.querySelector('#cl-sentence-subbar');
-    this.subbarText = root.querySelector('#cl-subbar-text');
+    this.bouncyStage = root.querySelector('#cl-bouncy-stage');
+    this.bouncyPrevEl = root.querySelector('#cl-bouncy-prev');
+    this.bouncyActiveEl = root.querySelector('#cl-bouncy-active');
+    this.bouncyNextEl = root.querySelector('#cl-bouncy-next');
     this.radialGlow = root.querySelector('#cl-radial-glow');
 
     this.lyricsContainer = root.querySelector('#cl-lyrics-scroll');
@@ -233,20 +230,18 @@ class LyricsOverlay {
   }
 
   toggleDisplayMode() {
-    this.setDisplayMode(this.displayMode === 'scatter' ? 'waterfall' : 'scatter');
+    this.setDisplayMode(this.displayMode === 'bouncy' ? 'waterfall' : 'bouncy');
   }
 
   setDisplayMode(mode) {
     this.displayMode = mode;
-    if (mode === 'scatter') {
-      this.constellationStage.style.display = 'block';
-      this.sentenceSubbar.style.display = 'flex';
+    if (mode === 'bouncy') {
+      this.bouncyStage.style.display = 'flex';
       this.lyricsContainer.style.display = 'none';
-      this.modeIcon.textContent = '🌌';
-      this.modeText.textContent = 'Scatter Canvas';
+      this.modeIcon.textContent = '✨';
+      this.modeText.textContent = 'Bouncy Reel';
     } else {
-      this.constellationStage.style.display = 'none';
-      this.sentenceSubbar.style.display = 'none';
+      this.bouncyStage.style.display = 'none';
       this.lyricsContainer.style.display = 'flex';
       this.modeIcon.textContent = '📜';
       this.modeText.textContent = 'Waterfall';
@@ -257,13 +252,11 @@ class LyricsOverlay {
   resetIdleTimer() {
     this.header.classList.remove('cl-idle-hidden');
     this.footer.classList.remove('cl-idle-hidden');
-    this.sentenceSubbar.style.opacity = '1';
     clearTimeout(this.idleTimer);
     this.idleTimer = setTimeout(() => {
       if (this.isVisible) {
         this.header.classList.add('cl-idle-hidden');
         this.footer.classList.add('cl-idle-hidden');
-        this.sentenceSubbar.style.opacity = '0';
       }
     }, 2800);
   }
@@ -336,19 +329,18 @@ class LyricsOverlay {
   updateLyrics(lyricsResult) {
     this.lyricsData = lyricsResult;
     this.lyricsContainer.innerHTML = '';
-    this.constellationStage.innerHTML = '';
-    this.scatterWords = [];
-    this.lastZoneIndices = [];
     this.activeLineIndex = -1;
     this.activeWordIndex = -1;
-    this.currentWordText = '';
 
     if (!lyricsResult || !lyricsResult.lines || lyricsResult.lines.length === 0) {
       const msg = lyricsResult && lyricsResult.instrumental
         ? '♪ Instrumental Track ♪'
         : 'No synchronized lyrics found';
 
-      this.subbarText.textContent = msg;
+      this.bouncyActiveEl.innerHTML = `<span class="cl-bouncy-word active">${msg}</span>`;
+      this.bouncyPrevEl.textContent = '';
+      this.bouncyNextEl.textContent = 'Enjoy the rhythm';
+
       this.lyricsContainer.innerHTML = `
         <div class="cl-status-view">
           <span style="font-size: 2rem;">✨</span>
@@ -392,7 +384,7 @@ class LyricsOverlay {
     // Fetch multi-line & word context
     const ctx = LrcParser.getLyricsContext(this.lyricsData.lines, currentTime, this.userOffset);
     if (ctx) {
-      this.renderConstellationWord(ctx);
+      this.renderBouncyLyrics(ctx);
     }
 
     // Waterfall active line update
@@ -403,112 +395,69 @@ class LyricsOverlay {
   }
 
   /**
-   * Systematic Constellation Scatter Engine:
-   * Selects an aesthetic non-colliding zone across the full screen,
-   * adds organic jitter, and smoothly fades older words into the dark abyss.
+   * Instagram Story Bouncy Lyric Presentation:
+   * Smoothly slides up previous phrases, springs in the active phrase,
+   * and runs the bouncy spring pop animation on each active word.
    */
-  renderConstellationWord(ctx) {
-    const { currentWord, currentLine, activeWordIndex, lineIndex } = ctx;
-    const cleanWord = currentWord.trim();
-    if (!cleanWord) return;
+  renderBouncyLyrics(ctx) {
+    const { lineIndex, activeWordIndex, currentLine, prevLine, nextLine } = ctx;
 
-    // Word key to avoid re-triggering during the same word's duration
-    const wordKey = `${lineIndex}:${activeWordIndex}:${cleanWord}`;
-    if (wordKey === this.currentWordText) return;
-    this.currentWordText = wordKey;
+    // 1. Line change: Trigger slide-in and build words
+    if (lineIndex !== this.activeLineIndex) {
+      this.activeLineIndex = lineIndex;
+      this.activeWordIndex = -1;
 
-    // Update bottom linear phrase subbar
-    this.subbarText.textContent = currentLine.text;
+      // Previous line smoothly glides up
+      this.bouncyPrevEl.textContent = prevLine ? prevLine.text : '';
+      this.bouncyNextEl.textContent = nextLine ? nextLine.text : '';
 
-    // 1. Age existing words on screen and fade them out progressively
-    for (let i = this.scatterWords.length - 1; i >= 0; i--) {
-      const item = this.scatterWords[i];
-      item.age += 1;
-      item.el.className = `cl-scatter-word age-${Math.min(5, item.age)}`;
+      // Rebuild active line words with slide-in animation
+      this.bouncyActiveEl.classList.remove('cl-line-slide-in');
+      void this.bouncyActiveEl.offsetWidth; // reflow
+      this.bouncyActiveEl.classList.add('cl-line-slide-in');
 
-      // Slight natural drift as words fade
-      const currentRot = item.rot || 0;
-      const driftY = item.age * 6;
-      item.el.style.transform = `translateY(${driftY}px) rotate(${currentRot}deg)`;
+      this.bouncyActiveEl.innerHTML = '';
+      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
+      
+      words.forEach((wObj, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-bouncy-word';
+        span.dataset.index = idx;
+        span.textContent = wObj.word;
 
-      // If word has reached age 5, remove from DOM
-      if (item.age >= 5) {
-        setTimeout(() => {
-          if (item.el.parentNode) item.el.remove();
-        }, 800);
-        this.scatterWords.splice(i, 1);
+        // Click word to seek
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.onSeek(wObj.time);
+        });
+
+        this.bouncyActiveEl.appendChild(span);
+      });
+    }
+
+    // 2. Word change: Run signature Instagram Spring Bounce
+    if (activeWordIndex !== this.activeWordIndex) {
+      this.activeWordIndex = activeWordIndex;
+
+      const spans = this.bouncyActiveEl.querySelectorAll('.cl-bouncy-word');
+      spans.forEach((span, idx) => {
+        span.classList.remove('active', 'passed', 'upcoming');
+        if (idx < activeWordIndex) {
+          span.classList.add('passed');
+        } else if (idx === activeWordIndex) {
+          span.classList.add('active');
+        } else {
+          span.classList.add('upcoming');
+        }
+      });
+
+      // Pulse ambient backdrop aura on the beat
+      if (this.radialGlow) {
+        this.radialGlow.classList.remove('cl-glow-pulse');
+        void this.radialGlow.offsetWidth;
+        this.radialGlow.classList.add('cl-glow-pulse');
       }
     }
-
-    // 2. Systematic Zone Selection across the full 100vw x 100vh canvas
-    // 14 carefully balanced spatial anchor zones that cover the full screen
-    const ZONES = [
-      { x: 14, y: 22 }, { x: 38, y: 19 }, { x: 62, y: 23 }, { x: 82, y: 21 },
-      { x: 20, y: 38 }, { x: 45, y: 35 }, { x: 74, y: 39 },
-      { x: 12, y: 55 }, { x: 36, y: 54 }, { x: 60, y: 56 }, { x: 84, y: 53 },
-      { x: 22, y: 72 }, { x: 48, y: 70 }, { x: 76, y: 72 }
-    ];
-
-    // Filter out recently used zones to avoid awkward stacking
-    const availableIndices = [];
-    for (let i = 0; i < ZONES.length; i++) {
-      if (!this.lastZoneIndices.includes(i)) {
-        availableIndices.push(i);
-      }
-    }
-
-    const pool = availableIndices.length > 0 ? availableIndices : [0, 1, 2, 3, 4, 5];
-    const pickedIdx = pool[Math.floor(Math.random() * pool.length)];
-
-    this.lastZoneIndices.push(pickedIdx);
-    if (this.lastZoneIndices.length > 4) {
-      this.lastZoneIndices.shift();
-    }
-
-    const baseZone = ZONES[pickedIdx];
-
-    // Add organic human jitter: +/- 4% on X, +/- 3% on Y, and slight rotation (-4° to +4°)
-    const jitterX = (Math.random() - 0.5) * 8;
-    const jitterY = (Math.random() - 0.5) * 6;
-    const finalX = Math.max(8, Math.min(84, baseZone.x + jitterX));
-    const finalY = Math.max(18, Math.min(76, baseZone.y + jitterY));
-    const rotation = (Math.random() - 0.5) * 8;
-
-    // 3. Create the new Age-0 word element
-    const wordEl = document.createElement('div');
-    wordEl.className = 'cl-scatter-word age-0';
-    wordEl.textContent = cleanWord;
-    wordEl.style.left = `${finalX}vw`;
-    wordEl.style.top = `${finalY}vh`;
-    wordEl.style.transform = `rotate(${rotation.toFixed(1)}deg)`;
-
-    // Click to seek to that word
-    const wordTime = currentLine.words && currentLine.words[activeWordIndex] ? currentLine.words[activeWordIndex].time : currentLine.time;
-    wordEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.onSeek(wordTime);
-    });
-
-    this.constellationStage.appendChild(wordEl);
-
-    // 4. Smoothly shift ambient radial aura behind the newest word
-    if (this.radialGlow) {
-      this.radialGlow.style.left = `${finalX}vw`;
-      this.radialGlow.style.top = `${finalY}vh`;
-      this.radialGlow.classList.remove('cl-glow-pulse');
-      void this.radialGlow.offsetWidth;
-      this.radialGlow.classList.add('cl-glow-pulse');
-    }
-
-    // Track active scatter item
-    this.scatterWords.unshift({
-      el: wordEl,
-      word: cleanWord,
-      time: wordTime,
-      age: 0,
-      rot: rotation,
-      zoneIdx: pickedIdx
-    });
   }
 
   setActiveLine(index) {

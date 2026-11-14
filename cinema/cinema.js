@@ -1,5 +1,5 @@
 /**
- * Cool Lyrics - Dedicated Standalone Systematic Constellation Scatter Mode
+ * Cool Lyrics - Dedicated Standalone Instagram Story Bouncy Lyrics Mode
  */
 
 (function () {
@@ -8,23 +8,20 @@
   let lyricsData = null;
   let activeIndex = -1;
   let activeWordIndex = -1;
-  let currentWordText = '';
   let userOffset = 0;
   
   let currentVibe = 'reel';
-  let displayMode = 'scatter'; // 'scatter' or 'waterfall'
-
-  let scatterWords = [];
-  let lastZoneIndices = [];
+  let displayMode = 'bouncy'; // 'bouncy' or 'waterfall'
 
   let isUserScrolling = false;
   let scrollResumeTimer = null;
   let idleTimer = null;
 
   // DOM Elements
-  const constellationStage = document.getElementById('cinema-constellation-stage');
-  const sentenceSubbar = document.getElementById('cinema-sentence-subbar');
-  const subbarText = document.getElementById('cinema-subbar-text');
+  const bouncyStage = document.getElementById('cinema-bouncy-stage');
+  const bouncyPrevEl = document.getElementById('cinema-bouncy-prev');
+  const bouncyActiveEl = document.getElementById('cinema-bouncy-active');
+  const bouncyNextEl = document.getElementById('cinema-bouncy-next');
   const radialGlow = document.getElementById('cinema-radial-glow');
 
   const stage = document.getElementById('lyrics-stage');
@@ -124,12 +121,10 @@
   function resetIdleTimer() {
     topBar.classList.remove('idle-fade');
     dock.classList.remove('idle-fade');
-    sentenceSubbar.style.opacity = '1';
     clearTimeout(idleTimer);
     idleTimer = setTimeout(() => {
       topBar.classList.add('idle-fade');
       dock.classList.add('idle-fade');
-      sentenceSubbar.style.opacity = '0';
     }, 3000);
   }
 
@@ -147,20 +142,18 @@
   }
 
   function toggleDisplayMode() {
-    setDisplayMode(displayMode === 'scatter' ? 'waterfall' : 'scatter');
+    setDisplayMode(displayMode === 'bouncy' ? 'waterfall' : 'bouncy');
   }
 
   function setDisplayMode(mode) {
     displayMode = mode;
-    if (mode === 'scatter') {
-      constellationStage.style.display = 'block';
-      sentenceSubbar.style.display = 'flex';
+    if (mode === 'bouncy') {
+      bouncyStage.style.display = 'flex';
       stage.style.display = 'none';
-      cinemaModeIcon.textContent = '🌌';
-      cinemaModeLabel.textContent = 'Scatter Canvas';
+      cinemaModeIcon.textContent = '✨';
+      cinemaModeLabel.textContent = 'Bouncy Reel';
     } else {
-      constellationStage.style.display = 'none';
-      sentenceSubbar.style.display = 'none';
+      bouncyStage.style.display = 'none';
       stage.style.display = 'flex';
       cinemaModeIcon.textContent = '📜';
       cinemaModeLabel.textContent = 'Waterfall';
@@ -232,9 +225,7 @@
     emptyState.querySelector('.cl-empty-title').textContent = 'Searching lyrics...';
     emptyState.querySelector('.cl-empty-subtitle').textContent = `${track.title} • ${track.artist}`;
     linesWrapper.innerHTML = '';
-    constellationStage.innerHTML = '';
-    scatterWords = [];
-    subbarText.textContent = '...';
+    bouncyActiveEl.innerHTML = '<span class="cl-bouncy-word active">...</span>';
 
     try {
       const res = await LyricsAPI.fetchLyrics({
@@ -259,12 +250,8 @@
 
   function renderLyrics(data) {
     linesWrapper.innerHTML = '';
-    constellationStage.innerHTML = '';
-    scatterWords = [];
-    lastZoneIndices = [];
     activeIndex = -1;
     activeWordIndex = -1;
-    currentWordText = '';
 
     if (!data || !data.lines || data.lines.length === 0) {
       const msg = data && data.instrumental
@@ -273,7 +260,10 @@
       emptyState.style.display = 'flex';
       emptyState.querySelector('.cl-empty-title').textContent = msg;
       emptyState.querySelector('.cl-empty-subtitle').textContent = 'Enjoy the rhythm';
-      subbarText.textContent = msg;
+
+      bouncyActiveEl.innerHTML = `<span class="cl-bouncy-word active">${msg}</span>`;
+      bouncyPrevEl.textContent = '';
+      bouncyNextEl.textContent = '';
       return;
     }
 
@@ -314,10 +304,10 @@
 
     if (!lyricsData || !lyricsData.lines || !lyricsData.isSynced) return;
 
-    // Constellation Scatter Update
+    // Instagram Bouncy Update
     const ctx = LrcParser.getLyricsContext(lyricsData.lines, state.currentTime, userOffset);
     if (ctx) {
-      renderCinemaConstellation(ctx);
+      renderCinemaBouncy(ctx);
     }
 
     // Waterfall active line update
@@ -327,91 +317,61 @@
     }
   }
 
-  function renderCinemaConstellation(ctx) {
-    const { currentWord, currentLine, activeWordIndex: newWordIdx, lineIndex } = ctx;
-    const clean = currentWord.trim();
-    if (!clean) return;
+  function renderCinemaBouncy(ctx) {
+    const { lineIndex, activeWordIndex: newWordIdx, currentLine, prevLine, nextLine } = ctx;
 
-    const wordKey = `${lineIndex}:${newWordIdx}:${clean}`;
-    if (wordKey === currentWordText) return;
-    currentWordText = wordKey;
+    // Line change: trigger slide-up transition
+    if (lineIndex !== activeIndex) {
+      activeIndex = lineIndex;
+      activeWordIndex = -1;
 
-    subbarText.textContent = currentLine.text;
+      bouncyPrevEl.textContent = prevLine ? prevLine.text : '';
+      bouncyNextEl.textContent = nextLine ? nextLine.text : '';
 
-    // Age previous words and fade
-    for (let i = scatterWords.length - 1; i >= 0; i--) {
-      const item = scatterWords[i];
-      item.age += 1;
-      item.el.className = `cl-scatter-word age-${Math.min(5, item.age)}`;
+      bouncyActiveEl.classList.remove('cl-line-slide-in');
+      void bouncyActiveEl.offsetWidth;
+      bouncyActiveEl.classList.add('cl-line-slide-in');
 
-      const driftY = item.age * 6;
-      item.el.style.transform = `translateY(${driftY}px) rotate(${item.rot || 0}deg)`;
+      bouncyActiveEl.innerHTML = '';
+      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
+      
+      words.forEach((wObj, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-bouncy-word';
+        span.dataset.index = idx;
+        span.textContent = wObj.word;
 
-      if (item.age >= 5) {
-        setTimeout(() => {
-          if (item.el.parentNode) item.el.remove();
-        }, 800);
-        scatterWords.splice(i, 1);
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sendMediaAction('SEEK', { time: wObj.time });
+        });
+
+        bouncyActiveEl.appendChild(span);
+      });
+    }
+
+    // Word change: trigger bouncy spring pop
+    if (newWordIdx !== activeWordIndex) {
+      activeWordIndex = newWordIdx;
+
+      const spans = bouncyActiveEl.querySelectorAll('.cl-bouncy-word');
+      spans.forEach((span, idx) => {
+        span.classList.remove('active', 'passed', 'upcoming');
+        if (idx < newWordIdx) {
+          span.classList.add('passed');
+        } else if (idx === newWordIdx) {
+          span.classList.add('active');
+        } else {
+          span.classList.add('upcoming');
+        }
+      });
+
+      if (radialGlow) {
+        radialGlow.classList.remove('cl-glow-pulse');
+        void radialGlow.offsetWidth;
+        radialGlow.classList.add('cl-glow-pulse');
       }
     }
-
-    // 14 spatial anchor zones covering full screen
-    const ZONES = [
-      { x: 14, y: 22 }, { x: 38, y: 19 }, { x: 62, y: 23 }, { x: 82, y: 21 },
-      { x: 20, y: 38 }, { x: 45, y: 35 }, { x: 74, y: 39 },
-      { x: 12, y: 55 }, { x: 36, y: 54 }, { x: 60, y: 56 }, { x: 84, y: 53 },
-      { x: 22, y: 72 }, { x: 48, y: 70 }, { x: 76, y: 72 }
-    ];
-
-    const available = [];
-    for (let i = 0; i < ZONES.length; i++) {
-      if (!lastZoneIndices.includes(i)) available.push(i);
-    }
-
-    const pool = available.length > 0 ? available : [0, 1, 2, 3, 4, 5];
-    const picked = pool[Math.floor(Math.random() * pool.length)];
-
-    lastZoneIndices.push(picked);
-    if (lastZoneIndices.length > 4) lastZoneIndices.shift();
-
-    const zone = ZONES[picked];
-    const jX = (Math.random() - 0.5) * 8;
-    const jY = (Math.random() - 0.5) * 6;
-    const finalX = Math.max(8, Math.min(84, zone.x + jX));
-    const finalY = Math.max(18, Math.min(76, zone.y + jY));
-    const rot = (Math.random() - 0.5) * 8;
-
-    const el = document.createElement('div');
-    el.className = 'cl-scatter-word age-0';
-    el.textContent = clean;
-    el.style.left = `${finalX}vw`;
-    el.style.top = `${finalY}vh`;
-    el.style.transform = `rotate(${rot.toFixed(1)}deg)`;
-
-    const wordTime = currentLine.words && currentLine.words[newWordIdx] ? currentLine.words[newWordIdx].time : currentLine.time;
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sendMediaAction('SEEK', { time: wordTime });
-    });
-
-    constellationStage.appendChild(el);
-
-    if (radialGlow) {
-      radialGlow.style.left = `${finalX}vw`;
-      radialGlow.style.top = `${finalY}vh`;
-      radialGlow.classList.remove('cl-glow-pulse');
-      void radialGlow.offsetWidth;
-      radialGlow.classList.add('cl-glow-pulse');
-    }
-
-    scatterWords.unshift({
-      el,
-      word: clean,
-      time: wordTime,
-      age: 0,
-      rot,
-      zoneIdx: picked
-    });
   }
 
   function setActiveLine(idx) {
