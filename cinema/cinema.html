@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="../icons/icon48.png">
   <link rel="stylesheet" href="cinema.css">
 </head>
-<body class="cl-vibe-kinetic">
+<body class="cl-vibe-reel">
   <div class="cl-cinema-root">
     <!-- Ambient radial glow backdrop -->
     <div class="cl-aura-bg">
@@ -24,16 +24,16 @@
       <div class="cl-actions">
         <!-- Genre / Vibe Selector -->
         <div class="cl-vibe-selector" id="cinema-vibe-selector">
-          <button class="cl-pill-btn active" data-vibe="kinetic">💥 Kinetic</button>
-          <button class="cl-pill-btn" data-vibe="cyber">⚡ Cyber</button>
-          <button class="cl-pill-btn" data-vibe="dreamwave">🌌 Dream</button>
-          <button class="cl-pill-btn" data-vibe="velvet">🖤 Velvet</button>
-          <button class="cl-pill-btn" data-vibe="waterfall">📜 Scroll</button>
+          <button class="cl-pill-btn active" data-vibe="reel">📸 Reel</button>
+          <button class="cl-pill-btn" data-vibe="slanted">💥 Drill</button>
+          <button class="cl-pill-btn" data-vibe="editorial">🍷 Vinyl</button>
+          <button class="cl-pill-btn" data-vibe="cyber">⚡ Matrix</button>
+          <button class="cl-pill-btn" data-vibe="classic">📜 Scroll</button>
         </div>
 
         <!-- Mode Toggle -->
         <button class="cl-mode-btn" id="btn-mode-toggle" title="Toggle Display Mode (V)">
-          <span id="cinema-mode-icon">🎯</span> <span id="cinema-mode-label">Word Hero</span>
+          <span id="cinema-mode-icon">✨</span> <span id="cinema-mode-label">Insta Mode</span>
         </button>
 
         <button class="cl-icon-btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
@@ -44,14 +44,14 @@
       </div>
     </header>
 
-    <!-- Stage 1: Kinetic Word Hero Display -->
-    <main class="cl-hero-stage" id="cinema-hero-stage">
-      <div class="cl-hero-word-box">
-        <div class="cl-hero-word" id="cinema-hero-word">READY</div>
-        <div class="cl-hero-context">
-          <div class="cl-hero-line-track" id="cinema-hero-line-track"></div>
-          <div class="cl-hero-upcoming" id="cinema-hero-upcoming"></div>
+    <!-- Stage 1: Instagram-Style Full-Phrase Lyric Stage -->
+    <main class="cl-insta-stage" id="cinema-insta-stage">
+      <div class="cl-insta-wrapper">
+        <div class="cl-insta-line-prev" id="cinema-line-prev"></div>
+        <div class="cl-insta-line-active" id="cinema-line-active">
+          <span class="cl-word active">READY</span>
         </div>
+        <div class="cl-insta-line-next" id="cinema-line-next"></div>
       </div>
     </main>
 

@@ -1,6 +1,6 @@
 /**
- * Cool Lyrics - In-Page Artistic Cinema Overlay Component
- * Features Kinetic Word Hero Mode & Genre-Responsive Aesthetics
+ * Cool Lyrics - In-Page Instagram-Style Cinema Overlay Component
+ * Features Full-Phrase Typography with Dynamic Word Karaoke Highlights
  */
 
 class LyricsOverlay {
@@ -15,11 +15,11 @@ class LyricsOverlay {
     this.currentTrack = null;
     this.lyricsData = null;
     this.activeLineIndex = -1;
-    this.currentHeroWord = '';
+    this.activeWordIndex = -1;
     this.userOffset = 0;
     
-    this.displayMode = 'hero'; // 'hero' (Kinetic Word) or 'waterfall' (Classic Scroll)
-    this.currentVibe = 'kinetic'; // 'kinetic', 'cyber', 'dreamwave', 'velvet', 'waterfall'
+    this.displayMode = 'insta'; // 'insta' (Instagram Full-Phrase) or 'waterfall' (Classic Scroll)
+    this.currentVibe = 'reel';  // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
     
     this.idleTimer = null;
     this.isUserScrolling = false;
@@ -52,15 +52,15 @@ class LyricsOverlay {
         <div class="cl-header-actions">
           <!-- Vibe Selector -->
           <div class="cl-vibe-pill-group" id="cl-vibe-selector">
-            <button class="cl-vibe-pill active" data-vibe="kinetic">💥 Kinetic</button>
-            <button class="cl-vibe-pill" data-vibe="cyber">⚡ Cyber</button>
-            <button class="cl-vibe-pill" data-vibe="dreamwave">🌌 Dream</button>
-            <button class="cl-vibe-pill" data-vibe="velvet">🖤 Velvet</button>
-            <button class="cl-vibe-pill" data-vibe="waterfall">📜 Scroll</button>
+            <button class="cl-vibe-pill active" data-vibe="reel">📸 Reel</button>
+            <button class="cl-vibe-pill" data-vibe="slanted">💥 Drill</button>
+            <button class="cl-vibe-pill" data-vibe="editorial">🍷 Vinyl</button>
+            <button class="cl-vibe-pill" data-vibe="cyber">⚡ Matrix</button>
+            <button class="cl-vibe-pill" data-vibe="classic">📜 Scroll</button>
           </div>
 
           <button class="cl-btn" id="cl-btn-mode" title="Toggle Display Mode (V)">
-            <span id="cl-mode-icon">🎯</span> <span id="cl-mode-text">Word Hero</span>
+            <span id="cl-mode-icon">✨</span> <span id="cl-mode-text">Insta Mode</span>
           </button>
           <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Standalone Window">
             <span>⧉</span>
@@ -74,18 +74,18 @@ class LyricsOverlay {
         </div>
       </header>
 
-      <!-- Stage 1: Kinetic Word Hero Display -->
-      <main class="cl-hero-stage" id="cl-hero-stage">
-        <div class="cl-hero-word-box">
-          <div class="cl-hero-word" id="cl-hero-word">READY</div>
-          <div class="cl-hero-context">
-            <div class="cl-hero-line-track" id="cl-hero-line-track"></div>
-            <div class="cl-hero-upcoming" id="cl-hero-upcoming"></div>
+      <!-- Stage 1: Instagram-Style Full-Phrase Lyric Stage -->
+      <main class="cl-insta-stage" id="cl-insta-stage">
+        <div class="cl-insta-wrapper">
+          <div class="cl-insta-line-prev" id="cl-line-prev"></div>
+          <div class="cl-insta-line-active" id="cl-line-active">
+            <span class="cl-word active">READY</span>
           </div>
+          <div class="cl-insta-line-next" id="cl-line-next"></div>
         </div>
       </main>
 
-      <!-- Stage 2: Fluid Waterfall Scroll Container -->
+      <!-- Stage 2: Classic Waterfall Scroll Container -->
       <main class="cl-lyrics-container" id="cl-lyrics-scroll" style="display: none;">
         <div class="cl-status-view">
           <div class="cl-spinner"></div>
@@ -131,10 +131,10 @@ class LyricsOverlay {
     // Elements
     this.header = root.querySelector('.cl-header');
     this.footer = root.querySelector('.cl-footer');
-    this.heroStage = root.querySelector('#cl-hero-stage');
-    this.heroWordEl = root.querySelector('#cl-hero-word');
-    this.heroLineTrackEl = root.querySelector('#cl-hero-line-track');
-    this.heroUpcomingEl = root.querySelector('#cl-hero-upcoming');
+    this.instaStage = root.querySelector('#cl-insta-stage');
+    this.linePrevEl = root.querySelector('#cl-line-prev');
+    this.lineActiveEl = root.querySelector('#cl-line-active');
+    this.lineNextEl = root.querySelector('#cl-line-next');
     this.radialGlow = root.querySelector('#cl-radial-glow');
 
     this.lyricsContainer = root.querySelector('#cl-lyrics-scroll');
@@ -164,10 +164,10 @@ class LyricsOverlay {
     this.root.querySelector('#cl-btn-prev').addEventListener('click', () => this.onPrev());
     this.root.querySelector('#cl-btn-next').addEventListener('click', () => this.onNext());
 
-    // Display mode toggle (Hero Word vs Waterfall Scroll)
+    // Mode toggle
     this.modeBtn.addEventListener('click', () => this.toggleDisplayMode());
 
-    // Vibe / Genre selector buttons
+    // Vibe buttons
     this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
       btn.addEventListener('click', () => {
         this.setVibe(btn.dataset.vibe);
@@ -187,7 +187,7 @@ class LyricsOverlay {
       this.onSeek(pos * this.currentTrack.duration);
     });
 
-    // Scroll wheel pause
+    // Manual scroll pause for waterfall
     this.lyricsContainer.addEventListener('wheel', () => {
       this.isUserScrolling = true;
       clearTimeout(this.userScrollResumeTimer);
@@ -224,25 +224,24 @@ class LyricsOverlay {
       btn.classList.toggle('active', btn.dataset.vibe === vibe);
     });
 
-    // If waterfall was chosen, switch to waterfall mode
-    if (vibe === 'waterfall') {
+    if (vibe === 'classic') {
       this.setDisplayMode('waterfall');
     }
   }
 
   toggleDisplayMode() {
-    this.setDisplayMode(this.displayMode === 'hero' ? 'waterfall' : 'hero');
+    this.setDisplayMode(this.displayMode === 'insta' ? 'waterfall' : 'insta');
   }
 
   setDisplayMode(mode) {
     this.displayMode = mode;
-    if (mode === 'hero') {
-      this.heroStage.style.display = 'flex';
+    if (mode === 'insta') {
+      this.instaStage.style.display = 'flex';
       this.lyricsContainer.style.display = 'none';
-      this.modeIcon.textContent = '🎯';
-      this.modeText.textContent = 'Word Hero';
+      this.modeIcon.textContent = '✨';
+      this.modeText.textContent = 'Insta Mode';
     } else {
-      this.heroStage.style.display = 'none';
+      this.instaStage.style.display = 'none';
       this.lyricsContainer.style.display = 'flex';
       this.modeIcon.textContent = '📜';
       this.modeText.textContent = 'Waterfall';
@@ -321,7 +320,7 @@ class LyricsOverlay {
 
     this.durationEl.textContent = LrcParser.formatTime(track.duration || 0);
 
-    // Auto-detect genre vibe
+    // Auto-detect Instagram-style vibe based on genre
     if (typeof GenreDetector !== 'undefined') {
       const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
       this.setVibe(autoVibe);
@@ -332,16 +331,16 @@ class LyricsOverlay {
     this.lyricsData = lyricsResult;
     this.lyricsContainer.innerHTML = '';
     this.activeLineIndex = -1;
-    this.currentHeroWord = '';
+    this.activeWordIndex = -1;
 
     if (!lyricsResult || !lyricsResult.lines || lyricsResult.lines.length === 0) {
       const msg = lyricsResult && lyricsResult.instrumental
         ? '♪ Instrumental Track ♪'
         : 'No synchronized lyrics found';
-      
-      this.heroWordEl.textContent = msg;
-      this.heroLineTrackEl.innerHTML = '';
-      this.heroUpcomingEl.textContent = 'Enjoy the rhythm';
+
+      this.lineActiveEl.innerHTML = `<span class="cl-word active">${msg}</span>`;
+      this.linePrevEl.textContent = '';
+      this.lineNextEl.textContent = 'Enjoy the rhythm';
 
       this.lyricsContainer.innerHTML = `
         <div class="cl-status-view">
@@ -352,7 +351,7 @@ class LyricsOverlay {
       return;
     }
 
-    // Populate waterfall list
+    // Populate waterfall scroll
     const fragment = document.createDocumentFragment();
     lyricsResult.lines.forEach((line, idx) => {
       const lineEl = document.createElement('div');
@@ -383,58 +382,73 @@ class LyricsOverlay {
 
     if (!this.lyricsData || !this.lyricsData.lines || !this.lyricsData.isSynced) return;
 
-    // 1. Kinetic Word Hero update
-    const activeWordObj = LrcParser.getActiveWord(this.lyricsData.lines, currentTime, this.userOffset);
-    if (activeWordObj) {
-      this.updateHeroDisplay(activeWordObj);
+    // Fetch multi-line & word context
+    const ctx = LrcParser.getLyricsContext(this.lyricsData.lines, currentTime, this.userOffset);
+    if (ctx) {
+      this.renderInstaLyrics(ctx);
     }
 
-    // 2. Waterfall active line update
-    const newIndex = activeWordObj ? activeWordObj.lineIndex : LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
-    if (newIndex !== this.activeLineIndex) {
-      this.setActiveLine(newIndex);
+    // Waterfall update
+    const lineIdx = ctx ? ctx.lineIndex : LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
+    if (lineIdx !== this.activeLineIndex) {
+      this.setActiveLine(lineIdx);
     }
   }
 
-  updateHeroDisplay(activeWordObj) {
-    const rawWord = activeWordObj.currentWord.trim();
-    if (rawWord !== this.currentHeroWord) {
-      this.currentHeroWord = rawWord;
-      this.heroWordEl.textContent = rawWord;
+  renderInstaLyrics(ctx) {
+    const { lineIndex, activeWordIndex, currentLine, prevLine, nextLine } = ctx;
 
-      // Retrigger slam animation
-      this.heroWordEl.classList.remove('cl-word-slam');
-      void this.heroWordEl.offsetWidth; // reflow
-      this.heroWordEl.classList.add('cl-word-slam');
+    // Check if line changed -> rebuild word elements
+    if (lineIndex !== this.activeLineIndex) {
+      this.activeLineIndex = lineIndex;
+      this.activeWordIndex = -1;
 
-      // Pulse radial backdrop aura
+      // Update surrounding context lines
+      this.linePrevEl.textContent = prevLine ? prevLine.text : '';
+      this.lineNextEl.textContent = nextLine ? nextLine.text : '';
+
+      // Build word elements inside active line
+      this.lineActiveEl.innerHTML = '';
+      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
+      
+      words.forEach((wObj, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-word';
+        span.dataset.index = idx;
+        span.textContent = wObj.word;
+
+        // Click to seek directly to this word!
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.onSeek(wObj.time);
+        });
+
+        this.lineActiveEl.appendChild(span);
+      });
+    }
+
+    // Check if word emphasis changed
+    if (activeWordIndex !== this.activeWordIndex) {
+      this.activeWordIndex = activeWordIndex;
+
+      const wordSpans = this.lineActiveEl.querySelectorAll('.cl-word');
+      wordSpans.forEach((span, idx) => {
+        span.classList.remove('active', 'passed', 'upcoming');
+        if (idx < activeWordIndex) {
+          span.classList.add('passed');
+        } else if (idx === activeWordIndex) {
+          span.classList.add('active');
+        } else {
+          span.classList.add('upcoming');
+        }
+      });
+
+      // Pulse background aura
       if (this.radialGlow) {
         this.radialGlow.classList.remove('cl-glow-pulse');
         void this.radialGlow.offsetWidth;
         this.radialGlow.classList.add('cl-glow-pulse');
       }
-    }
-
-    // Render phrase tracker words
-    const line = this.lyricsData.lines[activeWordObj.lineIndex];
-    if (line && line.words) {
-      this.heroLineTrackEl.innerHTML = '';
-      line.words.forEach((w, idx) => {
-        const span = document.createElement('span');
-        span.className = 'cl-track-word';
-        if (idx === activeWordObj.wordIndex) {
-          span.classList.add('active');
-        }
-        span.textContent = w.word;
-        this.heroLineTrackEl.appendChild(span);
-      });
-    }
-
-    // Render upcoming line preview
-    if (activeWordObj.nextLineText) {
-      this.heroUpcomingEl.textContent = `Next: "${activeWordObj.nextLineText}"`;
-    } else {
-      this.heroUpcomingEl.textContent = '';
     }
   }
 
@@ -442,7 +456,6 @@ class LyricsOverlay {
     const oldLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${this.activeLineIndex}"]`);
     if (oldLine) oldLine.classList.remove('cl-active');
 
-    this.activeLineIndex = index;
     if (index === -1) return;
 
     const newLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${index}"]`);

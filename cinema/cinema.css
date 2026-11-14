@@ -1,16 +1,19 @@
-/* Cool Lyrics - Cinema Standalone Artistic Mode Styling */
+/* Cool Lyrics - Cinema Standalone Instagram-Style Mode Styling */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@400;700;900&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --bg-color: #000000;
   --text-active: #ffffff;
-  --text-dimmed: rgba(255, 255, 255, 0.22);
-  --text-hover: rgba(255, 255, 255, 0.7);
+  --text-passed: rgba(255, 255, 255, 0.82);
+  --text-pending: rgba(255, 255, 255, 0.52);
+  --text-context: rgba(255, 255, 255, 0.24);
   --accent-color: #00f0ff;
   --glow-color: rgba(0, 240, 255, 0.55);
-  --font-display: 'Syne', 'Impact', -apple-system, sans-serif;
-  --font-body: 'Outfit', 'Inter', -apple-system, sans-serif;
+  --pill-bg: rgba(0, 240, 255, 0.14);
+  --font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --slant: 0deg;
 }
 
 * {
@@ -24,44 +27,68 @@ body, html {
   height: 100%;
   background-color: var(--bg-color);
   color: var(--text-active);
-  font-family: var(--font-body);
+  font-family: var(--font-meta);
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ===================================================
-   GENRE / VIBE VARIATIONS
+   GENRE / VIBE PERSONALITIES
    =================================================== */
 
-body.cl-vibe-kinetic {
-  --font-display: 'Syne', 'Impact', sans-serif;
-  --accent-color: #ff0055;
-  --glow-color: rgba(255, 0, 85, 0.5);
-}
-
-body.cl-vibe-cyber {
-  --font-display: 'Unbounded', 'Courier New', monospace;
+/* 1. 📸 Insta Reel */
+body.cl-vibe-reel {
+  --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.65);
+  --glow-color: rgba(0, 240, 255, 0.5);
+  --pill-bg: rgba(0, 240, 255, 0.16);
+  --slant: 0deg;
 }
 
-body.cl-vibe-dreamwave {
-  --font-display: 'Outfit', sans-serif;
-  --accent-color: #c084fc;
-  --glow-color: rgba(192, 132, 252, 0.45);
+/* 2. 💥 Street Drill */
+body.cl-vibe-slanted {
+  --font-lyric: 'Bebas Neue', 'Syne', 'Impact', sans-serif;
+  --accent-color: #ff0055;
+  --glow-color: rgba(255, 0, 85, 0.65);
+  --pill-bg: rgba(255, 0, 85, 0.2);
+  --slant: -6deg;
 }
 
-body.cl-vibe-velvet {
-  --font-display: 'Cinzel Decorative', 'Georgia', serif;
-  --accent-color: #e2b170;
-  --glow-color: rgba(226, 177, 112, 0.4);
+body.cl-vibe-slanted .cl-insta-line-active {
+  letter-spacing: 0.035em;
 }
 
-body.cl-vibe-waterfall {
-  --font-display: 'Outfit', -apple-system, sans-serif;
+/* 3. 🍷 Editorial Vinyl */
+body.cl-vibe-editorial {
+  --font-lyric: 'Playfair Display', 'Georgia', serif;
+  --accent-color: #fbbf24;
+  --glow-color: rgba(251, 191, 36, 0.45);
+  --pill-bg: rgba(251, 191, 36, 0.14);
+  --slant: 0deg;
+}
+
+body.cl-vibe-editorial .cl-word.active {
+  font-style: italic;
+  font-weight: 900;
+}
+
+/* 4. ⚡ Cyber Matrix */
+body.cl-vibe-cyber {
+  --font-lyric: 'Space Grotesk', monospace;
+  --accent-color: #10b981;
+  --glow-color: rgba(16, 185, 129, 0.55);
+  --pill-bg: rgba(16, 185, 129, 0.16);
+  --slant: 0deg;
+}
+
+/* 5. 📜 Minimal Studio */
+body.cl-vibe-classic {
+  --font-lyric: 'Plus Jakarta Sans', system-ui, sans-serif;
   --accent-color: #ffffff;
-  --glow-color: rgba(255, 255, 255, 0.35);
+  --glow-color: rgba(255, 255, 255, 0.3);
+  --pill-bg: rgba(255, 255, 255, 0.1);
+  --slant: 0deg;
 }
 
 .cl-cinema-root {
@@ -92,19 +119,19 @@ body.cl-vibe-waterfall {
   border-radius: 50%;
   filter: blur(150px);
   background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 65%);
-  opacity: 0.32;
+  opacity: 0.3;
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
 }
 
 .cl-glow-pulse {
-  animation: aura-beat 0.45s cubic-bezier(0.1, 0.9, 0.2, 1);
+  animation: aura-beat 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
 @keyframes aura-beat {
-  0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.25; }
-  50% { transform: translate(-50%, -50%) scale(1.18); opacity: 0.65; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.32; }
+  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.2; }
+  50% { transform: translate(-50%, -50%) scale(1.14); opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
 }
 
 /* Top Navigation Bar */
@@ -135,7 +162,6 @@ body.cl-vibe-waterfall {
 }
 
 .cl-badge {
-  font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -172,7 +198,6 @@ body.cl-vibe-waterfall {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
-  font-family: var(--font-body);
   font-size: 0.78rem;
   font-weight: 600;
   padding: 5px 12px;
@@ -196,7 +221,6 @@ body.cl-vibe-waterfall {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #ffffff;
-  font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 600;
   padding: 7px 14px;
@@ -233,10 +257,10 @@ body.cl-vibe-waterfall {
 }
 
 /* ===================================================
-   STAGE 1: KINETIC WORD HERO MODE
+   STAGE 1: INSTAGRAM-STYLE FULL-PHRASE STAGE
    =================================================== */
 
-.cl-hero-stage {
+.cl-insta-stage {
   position: relative;
   z-index: 10;
   flex: 1;
@@ -244,83 +268,104 @@ body.cl-vibe-waterfall {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 6vw;
+  padding: 0 8vw;
   text-align: center;
   overflow: hidden;
 }
 
-.cl-hero-word-box {
+.cl-insta-wrapper {
   position: relative;
   width: 100%;
-  max-width: 1300px;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 32px;
+  transform: skewX(var(--slant));
+  transition: transform 0.3s ease;
 }
 
-.cl-hero-word {
-  font-family: var(--font-display);
-  font-size: clamp(5rem, 12vw, 13rem);
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: -0.035em;
-  text-transform: uppercase;
-  color: #ffffff;
-  text-shadow: 0 0 35px var(--glow-color), 0 0 95px var(--glow-color);
-  word-break: break-word;
-  transition: color 0.3s ease;
-  will-change: transform, opacity;
-}
-
-.cl-word-slam {
-  animation: word-punch 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-@keyframes word-punch {
-  0% { transform: scale(0.82) translateY(12px); opacity: 0.4; }
-  60% { transform: scale(1.04) translateY(-2px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-.cl-hero-context {
-  margin-top: 38px;
-  max-width: 860px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.cl-hero-line-track {
-  font-size: 1.6rem;
+.cl-insta-line-prev {
+  font-family: var(--font-lyric);
+  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
   font-weight: 600;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.35;
+  color: var(--text-context);
+  filter: blur(1px);
+  transform: translateY(-6px);
+  transition: all 0.35s ease;
+  max-width: 900px;
+}
+
+.cl-insta-line-active {
+  font-family: var(--font-lyric);
+  font-size: clamp(2.5rem, 5vw, 4.6rem);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  align-items: center;
+  gap: 12px 16px;
+  max-width: 1150px;
+  padding: 12px 20px;
+  border-radius: 24px;
+  transition: all 0.3s ease;
 }
 
-.cl-track-word {
-  padding: 2px 4px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+.cl-word {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
-.cl-track-word.active {
+.cl-word.passed {
+  color: var(--text-passed);
+  opacity: 0.9;
+}
+
+.cl-word.upcoming {
+  color: var(--text-pending);
+  opacity: 0.6;
+}
+
+.cl-word.active {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
-  text-shadow: 0 0 12px var(--glow-color);
-  font-weight: 800;
+  background: var(--pill-bg);
+  box-shadow: 0 0 26px var(--glow-color), 0 0 50px var(--glow-color);
+  transform: scale(1.1);
+  font-weight: 900;
+  opacity: 1;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  animation: word-bounce 0.24s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
 
-.cl-hero-upcoming {
-  font-size: 1.15rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.28);
-  font-style: italic;
+@keyframes word-bounce {
+  0% { transform: scale(0.96); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.1); }
+}
+
+.cl-word:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.cl-insta-line-next {
+  font-family: var(--font-lyric);
+  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-context);
+  filter: blur(1px);
+  transform: translateY(6px);
+  transition: all 0.35s ease;
+  max-width: 900px;
 }
 
 /* ===================================================
@@ -357,13 +402,13 @@ body.cl-vibe-waterfall {
   margin: 18px 0;
   padding: 12px 28px;
   border-radius: 18px;
-  font-family: var(--font-display);
+  font-family: var(--font-lyric);
   font-size: 2.3rem;
   line-height: 1.35;
   font-weight: 700;
   letter-spacing: -0.02em;
   text-align: center;
-  color: var(--text-dimmed);
+  color: rgba(255, 255, 255, 0.24);
   filter: blur(0.7px);
   transform: scale(0.96);
   cursor: pointer;
@@ -372,7 +417,7 @@ body.cl-vibe-waterfall {
 }
 
 .cl-line-item:hover {
-  color: var(--text-hover);
+  color: rgba(255, 255, 255, 0.7);
   filter: blur(0);
   background: rgba(255, 255, 255, 0.04);
 }
@@ -468,7 +513,7 @@ body.cl-vibe-waterfall {
 }
 
 .cl-dock-title {
-  font-family: var(--font-display);
+  font-family: var(--font-lyric);
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;

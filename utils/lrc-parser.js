@@ -1,6 +1,6 @@
 /**
  * LRC Synchronized Lyrics Parser & Synchronization Utility
- * Enhanced with word-level interpolation for Kinetic Hero displays.
+ * Supports full phrase & word-level Instagram-style sticker layouts.
  */
 
 const LrcParser = {
@@ -25,14 +25,12 @@ const LrcParser = {
       const trimmed = rawLine.trim();
       if (!trimmed) continue;
 
-      // Metadata tags e.g. [ar:Artist], [ti:Title]
       const metaMatch = trimmed.match(metaRegex);
       if (metaMatch && !trimmed.match(timeRegex)) {
         metadata[metaMatch[1].toLowerCase()] = metaMatch[2].trim();
         continue;
       }
 
-      // Timestamp tags
       const matches = [...trimmed.matchAll(timeRegex)];
       if (matches.length > 0) {
         const text = trimmed.replace(timeRegex, '').trim();
@@ -56,7 +54,7 @@ const LrcParser = {
     // Sort chronologically
     lines.sort((a, b) => a.time - b.time);
 
-    // Apply global offset if specified in metadata
+    // Global offset
     const globalOffsetMs = parseInt(metadata.offset || '0', 10);
     if (!isNaN(globalOffsetMs) && globalOffsetMs !== 0) {
       const offsetSec = globalOffsetMs / 1000;
@@ -65,14 +63,13 @@ const LrcParser = {
       }
     }
 
-    // Calculate duration & word-level timing for each line
+    // Calculate duration & word-level timing
     for (let i = 0; i < lines.length; i++) {
       const current = lines[i];
       const next = lines[i + 1];
       const lineDuration = next ? Math.max(1.5, Math.min(8, next.time - current.time)) : 4.0;
       current.duration = lineDuration;
 
-      // Split line into words
       const rawWords = current.text.split(/\s+/).filter(w => w.length > 0);
       if (rawWords.length > 0) {
         const wordInterval = lineDuration / rawWords.length;
@@ -96,7 +93,7 @@ const LrcParser = {
       .filter(l => l.length > 0 && !l.startsWith('['))
       .map((text, idx) => {
         const time = idx * 4;
-        const rawWords = text.split(/\s+/);
+        const rawWords = text.split(/\s+/).filter(w => w.length > 0);
         const interval = 4 / Math.max(1, rawWords.length);
         return {
           time,
@@ -117,13 +114,6 @@ const LrcParser = {
     };
   },
 
-  /**
-   * Finds the currently active lyric line index based on playback time.
-   * @param {Array} lines 
-   * @param {number} currentTime 
-   * @param {number} offset 
-   * @returns {number}
-   */
   getActiveIndex(lines, currentTime, offset = 0) {
     if (!lines || lines.length === 0) return -1;
     const adjustedTime = currentTime + offset;
@@ -146,40 +136,49 @@ const LrcParser = {
   },
 
   /**
-   * Finds the currently active individual word
+   * Returns complete multi-line and word context for Instagram-style presentation
    * @param {Array} lines 
    * @param {number} currentTime 
    * @param {number} offset 
-   * @returns {{ currentWord: string, lineIndex: number, wordIndex: number, lineText: string, nextLineText: string, progress: number }}
    */
-  getActiveWord(lines, currentTime, offset = 0) {
+  getLyricsContext(lines, currentTime, offset = 0) {
     const lineIndex = this.getActiveIndex(lines, currentTime, offset);
     if (lineIndex < 0 || !lines[lineIndex]) {
       return null;
     }
 
-    const line = lines[lineIndex];
-    const nextLine = lines[lineIndex + 1];
-    const adjustedTime = currentTime + offset;
+    const currentLine = lines[lineIndex];
+    const prevLine = lineIndex > 0 ? lines[lineIndex - 1] : null;
+    const nextLine = lineIndex + 1 < lines.length ? lines[lineIndex + 1] : null;
+    const nextNextLine = lineIndex + 2 < lines.length ? lines[lineIndex + 2] : null;
 
+    const adjustedTime = currentTime + offset;
     let activeWordIndex = 0;
-    for (let i = 0; i < line.words.length; i++) {
-      if (adjustedTime >= line.words[i].time) {
+
+    for (let i = 0; i < currentLine.words.length; i++) {
+      if (adjustedTime >= currentLine.words[i].time) {
         activeWordIndex = i;
       }
     }
 
-    const currentWordObj = line.words[activeWordIndex] || { word: line.text, time: line.time, endTime: line.time + line.duration };
+    const currentWordObj = currentLine.words[activeWordIndex] || {
+      word: currentLine.text,
+      time: currentLine.time,
+      endTime: currentLine.time + currentLine.duration
+    };
+
     const wordDuration = Math.max(0.1, currentWordObj.endTime - currentWordObj.time);
-    const progress = Math.min(1, Math.max(0, (adjustedTime - currentWordObj.time) / wordDuration));
+    const wordProgress = Math.min(1, Math.max(0, (adjustedTime - currentWordObj.time) / wordDuration));
 
     return {
-      currentWord: currentWordObj.word,
       lineIndex,
-      wordIndex: activeWordIndex,
-      lineText: line.text,
-      nextLineText: nextLine ? nextLine.text : '',
-      progress
+      activeWordIndex,
+      currentWord: currentWordObj.word,
+      currentLine,
+      prevLine,
+      nextLine,
+      nextNextLine,
+      wordProgress
     };
   },
 

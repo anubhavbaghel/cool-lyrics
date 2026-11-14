@@ -1,5 +1,5 @@
 /**
- * Cool Lyrics - Dedicated Standalone Artistic Cinema Mode
+ * Cool Lyrics - Dedicated Standalone Instagram-Style Cinema Mode
  */
 
 (function () {
@@ -7,21 +7,21 @@
   let currentTrack = null;
   let lyricsData = null;
   let activeIndex = -1;
-  let currentHeroWord = '';
+  let activeWordIndex = -1;
   let userOffset = 0;
   
-  let currentVibe = 'kinetic';
-  let displayMode = 'hero'; // 'hero' or 'waterfall'
+  let currentVibe = 'reel';
+  let displayMode = 'insta'; // 'insta' or 'waterfall'
 
   let isUserScrolling = false;
   let scrollResumeTimer = null;
   let idleTimer = null;
 
   // DOM Elements
-  const heroStage = document.getElementById('cinema-hero-stage');
-  const heroWordEl = document.getElementById('cinema-hero-word');
-  const heroLineTrackEl = document.getElementById('cinema-hero-line-track');
-  const heroUpcomingEl = document.getElementById('cinema-hero-upcoming');
+  const instaStage = document.getElementById('cinema-insta-stage');
+  const linePrevEl = document.getElementById('cinema-line-prev');
+  const lineActiveEl = document.getElementById('cinema-line-active');
+  const lineNextEl = document.getElementById('cinema-line-next');
   const radialGlow = document.getElementById('cinema-radial-glow');
 
   const stage = document.getElementById('lyrics-stage');
@@ -62,17 +62,17 @@
   }
 
   function bindEvents() {
-    // Vibe switching
+    // Vibe buttons
     document.querySelectorAll('.cl-pill-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         setVibe(btn.dataset.vibe);
       });
     });
 
-    // Display mode toggle (Hero vs Waterfall)
+    // Display mode toggle (Insta vs Waterfall)
     btnModeToggle.addEventListener('click', toggleDisplayMode);
 
-    // Fullscreen
+    // Fullscreen & Hotkeys
     btnFullscreen.addEventListener('click', toggleFullscreen);
     window.addEventListener('keydown', (e) => {
       if (e.key === 'f' || e.key === 'F') {
@@ -104,7 +104,7 @@
     syncPlus.addEventListener('click', () => adjustOffset(0.5));
     syncReset.addEventListener('click', () => setOffset(0));
 
-    // Manual scroll pause
+    // Manual scroll pause for waterfall
     stage.addEventListener('wheel', () => {
       isUserScrolling = true;
       clearTimeout(scrollResumeTimer);
@@ -136,24 +136,24 @@
       btn.classList.toggle('active', btn.dataset.vibe === vibe);
     });
 
-    if (vibe === 'waterfall') {
+    if (vibe === 'classic') {
       setDisplayMode('waterfall');
     }
   }
 
   function toggleDisplayMode() {
-    setDisplayMode(displayMode === 'hero' ? 'waterfall' : 'hero');
+    setDisplayMode(displayMode === 'insta' ? 'waterfall' : 'insta');
   }
 
   function setDisplayMode(mode) {
     displayMode = mode;
-    if (mode === 'hero') {
-      heroStage.style.display = 'flex';
+    if (mode === 'insta') {
+      instaStage.style.display = 'flex';
       stage.style.display = 'none';
-      cinemaModeIcon.textContent = '🎯';
-      cinemaModeLabel.textContent = 'Word Hero';
+      cinemaModeIcon.textContent = '✨';
+      cinemaModeLabel.textContent = 'Insta Mode';
     } else {
-      heroStage.style.display = 'none';
+      instaStage.style.display = 'none';
       stage.style.display = 'flex';
       cinemaModeIcon.textContent = '📜';
       cinemaModeLabel.textContent = 'Waterfall';
@@ -207,7 +207,7 @@
       dockArt.src = track.artwork;
     }
 
-    // Auto-detect vibe
+    // Auto-detect Instagram vibe
     if (typeof GenreDetector !== 'undefined') {
       const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
       setVibe(autoVibe);
@@ -226,7 +226,7 @@
     emptyState.querySelector('.cl-empty-title').textContent = 'Searching lyrics...';
     emptyState.querySelector('.cl-empty-subtitle').textContent = `${track.title} • ${track.artist}`;
     linesWrapper.innerHTML = '';
-    heroWordEl.textContent = '...';
+    lineActiveEl.innerHTML = '<span class="cl-word active">...</span>';
 
     try {
       const res = await LyricsAPI.fetchLyrics({
@@ -252,7 +252,7 @@
   function renderLyrics(data) {
     linesWrapper.innerHTML = '';
     activeIndex = -1;
-    currentHeroWord = '';
+    activeWordIndex = -1;
 
     if (!data || !data.lines || data.lines.length === 0) {
       const msg = data && data.instrumental
@@ -262,9 +262,9 @@
       emptyState.querySelector('.cl-empty-title').textContent = msg;
       emptyState.querySelector('.cl-empty-subtitle').textContent = 'Enjoy the rhythm';
 
-      heroWordEl.textContent = msg;
-      heroLineTrackEl.innerHTML = '';
-      heroUpcomingEl.textContent = '';
+      lineActiveEl.innerHTML = `<span class="cl-word active">${msg}</span>`;
+      linePrevEl.textContent = '';
+      lineNextEl.textContent = '';
       return;
     }
 
@@ -307,28 +307,63 @@
 
     if (!lyricsData || !lyricsData.lines || !lyricsData.isSynced) return;
 
-    // 1. Kinetic Word Hero update
-    const wordObj = LrcParser.getActiveWord(lyricsData.lines, state.currentTime, userOffset);
-    if (wordObj) {
-      updateHeroWord(wordObj);
+    // 1. Instagram-Style Multi-Word Context Update
+    const ctx = LrcParser.getLyricsContext(lyricsData.lines, state.currentTime, userOffset);
+    if (ctx) {
+      renderInstaCinemaLyrics(ctx);
     }
 
     // 2. Waterfall active line update
-    const idx = wordObj ? wordObj.lineIndex : LrcParser.getActiveIndex(lyricsData.lines, state.currentTime, userOffset);
+    const idx = ctx ? ctx.lineIndex : LrcParser.getActiveIndex(lyricsData.lines, state.currentTime, userOffset);
     if (idx !== activeIndex) {
       setActiveLine(idx);
     }
   }
 
-  function updateHeroWord(wordObj) {
-    const raw = wordObj.currentWord.trim();
-    if (raw !== currentHeroWord) {
-      currentHeroWord = raw;
-      heroWordEl.textContent = raw;
+  function renderInstaCinemaLyrics(ctx) {
+    const { lineIndex, activeWordIndex: newWordIdx, currentLine, prevLine, nextLine } = ctx;
 
-      heroWordEl.classList.remove('cl-word-slam');
-      void heroWordEl.offsetWidth;
-      heroWordEl.classList.add('cl-word-slam');
+    // Line change
+    if (lineIndex !== activeIndex) {
+      activeIndex = lineIndex;
+      activeWordIndex = -1;
+
+      linePrevEl.textContent = prevLine ? prevLine.text : '';
+      lineNextEl.textContent = nextLine ? nextLine.text : '';
+
+      lineActiveEl.innerHTML = '';
+      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
+      
+      words.forEach((wObj, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-word';
+        span.dataset.index = idx;
+        span.textContent = wObj.word;
+
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sendMediaAction('SEEK', { time: wObj.time });
+        });
+
+        lineActiveEl.appendChild(span);
+      });
+    }
+
+    // Word change
+    if (newWordIdx !== activeWordIndex) {
+      activeWordIndex = newWordIdx;
+
+      const spans = lineActiveEl.querySelectorAll('.cl-word');
+      spans.forEach((span, idx) => {
+        span.classList.remove('active', 'passed', 'upcoming');
+        if (idx < newWordIdx) {
+          span.classList.add('passed');
+        } else if (idx === newWordIdx) {
+          span.classList.add('active');
+        } else {
+          span.classList.add('upcoming');
+        }
+      });
 
       if (radialGlow) {
         radialGlow.classList.remove('cl-glow-pulse');
@@ -336,32 +371,12 @@
         radialGlow.classList.add('cl-glow-pulse');
       }
     }
-
-    // Line track
-    const line = lyricsData.lines[wordObj.lineIndex];
-    if (line && line.words) {
-      heroLineTrackEl.innerHTML = '';
-      line.words.forEach((w, i) => {
-        const span = document.createElement('span');
-        span.className = 'cl-track-word';
-        if (i === wordObj.wordIndex) span.classList.add('active');
-        span.textContent = w.word;
-        heroLineTrackEl.appendChild(span);
-      });
-    }
-
-    if (wordObj.nextLineText) {
-      heroUpcomingEl.textContent = `Next: "${wordObj.nextLineText}"`;
-    } else {
-      heroUpcomingEl.textContent = '';
-    }
   }
 
   function setActiveLine(idx) {
     const oldEl = linesWrapper.querySelector(`.cl-line-item[data-index="${activeIndex}"]`);
     if (oldEl) oldEl.classList.remove('active');
 
-    activeIndex = idx;
     if (idx < 0) return;
 
     const newEl = linesWrapper.querySelector(`.cl-line-item[data-index="${idx}"]`);
