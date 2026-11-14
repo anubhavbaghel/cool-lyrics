@@ -1,0 +1,429 @@
+/* Cool Lyrics - Pitch Black Cinema Overlay Styles */
+
+:root {
+  --cl-bg: #000000;
+  --cl-text-primary: #ffffff;
+  --cl-text-dimmed: rgba(255, 255, 255, 0.25);
+  --cl-text-hover: rgba(255, 255, 255, 0.7);
+  --cl-accent-cyan: #00f0ff;
+  --cl-accent-magenta: #f43f5e;
+  --cl-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'SF Pro Display', sans-serif;
+}
+
+#cool-lyrics-root {
+  all: initial;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483647;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--cl-font-family);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#cool-lyrics-root.cl-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Background effects */
+.cl-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000000;
+  overflow: hidden;
+}
+
+/* Ambient dynamic glow mode */
+.cl-theme-ambient .cl-bg-glow {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.18;
+  pointer-events: none;
+  transition: all 1.2s ease;
+  top: 20%;
+  left: 20%;
+  background: radial-gradient(circle, var(--cl-accent-cyan) 0%, var(--cl-accent-magenta) 70%, transparent 100%);
+  animation: cl-float 16s ease-in-out infinite alternate;
+}
+
+@keyframes cl-float {
+  0% { transform: translate(-10%, -10%) scale(0.9); }
+  50% { transform: translate(15%, 10%) scale(1.1); }
+  100% { transform: translate(-5%, 15%) scale(1); }
+}
+
+/* Top Header Bar */
+.cl-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 36px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.cl-header.cl-idle-hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.cl-track-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 50%;
+}
+
+.cl-artwork {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.8), 0 0 12px rgba(255,255,255,0.08);
+}
+
+.cl-track-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cl-track-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.02em;
+}
+
+.cl-track-artist {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 3px;
+}
+
+.cl-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cl-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cl-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.cl-btn:active {
+  transform: translateY(0);
+}
+
+.cl-btn-icon {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* Center Lyrics Container */
+.cl-lyrics-container {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding: 40vh 8vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-width: none; /* Firefox */
+}
+
+.cl-lyrics-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Lyric Lines */
+.cl-line {
+  margin: 18px 0;
+  padding: 10px 24px;
+  border-radius: 16px;
+  font-size: 2.1rem;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-align: center;
+  color: var(--cl-text-dimmed);
+  filter: blur(0.6px);
+  transform: scale(0.96);
+  transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+  cursor: pointer;
+  max-width: 900px;
+  word-break: break-word;
+  position: relative;
+}
+
+.cl-line:hover {
+  color: var(--cl-text-hover);
+  filter: blur(0);
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Active Lyric Line */
+.cl-line.cl-active {
+  color: #ffffff;
+  font-size: 2.5rem;
+  font-weight: 800;
+  filter: blur(0);
+  transform: scale(1.05);
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Neon Cyberpunk Theme */
+.cl-theme-neon .cl-line.cl-active {
+  color: var(--cl-accent-cyan);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 35px rgba(0, 240, 255, 0.4);
+}
+
+/* Empty / Loading State */
+.cl-status-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.2rem;
+}
+
+.cl-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--cl-accent-cyan);
+  border-radius: 50%;
+  animation: cl-spin 0.8s linear infinite;
+}
+
+@keyframes cl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Bottom Controls Dock */
+.cl-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 36px 28px 36px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0) 100%);
+  gap: 14px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.cl-footer.cl-idle-hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+/* Scrubber / Progress Bar */
+.cl-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 650px;
+}
+
+.cl-time-label {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 42px;
+}
+
+.cl-progress-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  cursor: pointer;
+  position: relative;
+  transition: height 0.15s ease;
+}
+
+.cl-progress-track:hover {
+  height: 8px;
+}
+
+.cl-progress-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 999px;
+  position: relative;
+  width: 0%;
+}
+
+.cl-theme-neon .cl-progress-fill {
+  background: var(--cl-accent-cyan);
+  box-shadow: 0 0 8px var(--cl-accent-cyan);
+}
+
+.cl-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 650px;
+}
+
+.cl-media-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cl-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cl-play-btn:hover {
+  transform: scale(1.08);
+  background: #f1f5f9;
+}
+
+.cl-offset-tuner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cl-offset-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.cl-offset-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Floating Launcher Pill on Spotify / YT */
+#cool-lyrics-floating-pill {
+  all: initial;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  background: #080808;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 16px rgba(0, 240, 255, 0.25);
+  color: #ffffff;
+  font-family: var(--cl-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+#cool-lyrics-floating-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: #00f0ff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 240, 255, 0.45);
+}
+
+.cl-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
+  animation: cl-pulse 2s infinite ease-in-out;
+}
+
+@keyframes cl-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}

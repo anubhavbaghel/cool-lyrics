@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cool Lyrics</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <div class="header-logo">
+        <img src="../icons/icon48.png" alt="Logo" width="24" height="24">
+        <span class="header-title">Cool Lyrics</span>
+      </div>
+      <span class="status-pill" id="status-pill">Ready</span>
+    </header>
+
+    <!-- Currently Playing Card -->
+    <div class="player-card" id="player-card">
+      <img class="track-artwork" id="track-art" src="../icons/icon128.png" alt="Artwork">
+      <div class="track-details">
+        <div class="track-name" id="track-name">Waiting for music</div>
+        <div class="track-artist" id="track-artist">Start playing a song</div>
+        <div class="track-platform" id="track-platform">Spotify • YT Music • YouTube</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-list">
+      <button class="action-btn action-primary" id="btn-in-page">
+        <span class="btn-icon">⚡</span>
+        <div class="btn-text-group">
+          <span class="btn-main-text">In-Page Cinema Overlay</span>
+          <span class="btn-sub-text">Pitch black overlay on player (Alt+L)</span>
+        </div>
+      </button>
+
+      <button class="action-btn action-secondary" id="btn-standalone">
+        <span class="btn-icon">⛶</span>
+        <div class="btn-text-group">
+          <span class="btn-main-text">Standalone Cinema Tab</span>
+          <span class="btn-sub-text">Great for 2nd monitor or fullscreen</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Quick launch shortcuts if no song playing -->
+    <div class="quick-links">
+      <span class="links-label">Quick Launch:</span>
+      <a href="https://open.spotify.com" target="_blank" class="link-item">Spotify</a>
+      <span class="link-sep">•</span>
+      <a href="https://music.youtube.com" target="_blank" class="link-item">YT Music</a>
+      <span class="link-sep">•</span>
+      <a href="https://www.youtube.com" target="_blank" class="link-item">YouTube</a>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
