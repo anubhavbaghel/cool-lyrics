@@ -28,10 +28,12 @@
     "*://open.spotify.com/*",
     "*://music.youtube.com/*",
     "*://www.youtube.com/*",
-    "https://lrclib.net/*"
+    "https://lrclib.net/*",
+    "http://127.0.0.1:*/*",
+    "http://localhost:*/*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' https://fonts.gstatic.com; credentials 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://lrclib.net http://127.0.0.1:* http://localhost:*;"
   },
   "content_scripts": [
     {
@@ -44,6 +46,8 @@
         "utils/title-cleaner.js",
         "utils/lrc-parser.js",
         "utils/lyrics-api.js",
+        "utils/color-extractor.js",
+        "utils/wiz-client.js",
         "content/overlay.js",
         "content/content.js"
       ],

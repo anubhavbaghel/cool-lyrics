@@ -44,6 +44,58 @@ class LyricsOverlay {
         </div>
 
         <div class="cl-header-actions">
+          <div class="cl-wiz-wrapper" style="position: relative;">
+            <button class="cl-btn" id="cl-btn-wiz" title="Philips WiZ Smart Bulb Sync">
+              <span class="cl-wiz-status-dot" id="cl-overlay-wiz-dot"></span>
+              <span>💡 WiZ Light</span>
+            </button>
+
+            <!-- WiZ Floating Popover Panel -->
+            <div class="cl-wiz-popover" id="cl-overlay-wiz-popover" style="display: none;">
+              <div class="cl-wiz-header">
+                <span class="cl-wiz-title">💡 WiZ Room Sync</span>
+                <span class="cl-wiz-chip" id="cl-overlay-wiz-status">Checking...</span>
+              </div>
+
+              <div class="cl-wiz-row">
+                <span>Enable Sync</span>
+                <label class="cl-switch">
+                  <input type="checkbox" id="cl-overlay-wiz-enable">
+                  <span class="cl-slider"></span>
+                </label>
+              </div>
+
+              <div class="cl-wiz-row">
+                <span>Lighting Mode</span>
+                <select id="cl-overlay-wiz-mode" class="cl-select">
+                  <option value="album">🎨 Album Art Vibrant</option>
+                  <option value="neon">⚡ Cyber Neon</option>
+                  <option value="aurora">🌌 Aurora Emerald</option>
+                  <option value="warm">🕯️ Cozy Warm Studio</option>
+                </select>
+              </div>
+
+              <div class="cl-wiz-row">
+                <span>Brightness</span>
+                <input type="range" id="cl-overlay-wiz-brightness" min="10" max="100" value="85" class="cl-range">
+                <span id="cl-overlay-wiz-brightness-val" style="font-size: 11px; width: 28px; text-align: right;">85%</span>
+              </div>
+
+              <div class="cl-wiz-row">
+                <span>Lyric Beat Pulse</span>
+                <label class="cl-switch">
+                  <input type="checkbox" id="cl-overlay-wiz-pulse" checked>
+                  <span class="cl-slider"></span>
+                </label>
+              </div>
+
+              <div class="cl-wiz-footer">
+                <button class="cl-wiz-action-btn" id="cl-overlay-btn-wiz-test">✨ Test Flash</button>
+                <button class="cl-wiz-action-btn" id="cl-overlay-btn-wiz-scan">🔍 Scan</button>
+              </div>
+            </div>
+          </div>
+
           <button class="cl-btn" id="cl-btn-theme" title="Cycle visual theme">
             <span>✨</span> <span id="cl-theme-name">Pitch Black</span>
           </button>
@@ -135,6 +187,9 @@ class LyricsOverlay {
 
     // Theme cycle
     this.root.querySelector('#cl-btn-theme').addEventListener('click', () => this.cycleTheme());
+
+    // WiZ Smart Light Controls
+    this.initWizOverlayControls();
 
     // Offset tuner
     this.root.querySelector('#cl-offset-minus').addEventListener('click', () => this.adjustOffset(-0.5));
@@ -261,6 +316,11 @@ class LyricsOverlay {
     }
 
     this.durationEl.textContent = LrcParser.formatTime(track.duration || 0);
+
+    // WiZ Smart Light ambient track sync
+    if (typeof wizClient !== 'undefined') {
+      wizClient.syncTrack(track, this.artworkImg);
+    }
   }
 
   updateLyrics(lyricsResult) {
@@ -334,7 +394,117 @@ class LyricsOverlay {
       if (!this.isUserScrolling) {
         this.scrollToActiveLine(true);
       }
+      // Gentle pulse accent on WiZ smart bulb on line change
+      if (typeof wizClient !== 'undefined') {
+        wizClient.pulseActiveLine();
+      }
     }
+  }
+
+  initWizOverlayControls() {
+    if (typeof wizClient === 'undefined') return;
+
+    const btnToggle = this.root.querySelector('#cl-btn-wiz');
+    const popover = this.root.querySelector('#cl-overlay-wiz-popover');
+    const wizDot = this.root.querySelector('#cl-overlay-wiz-dot');
+    const statusBadge = this.root.querySelector('#cl-overlay-wiz-status');
+    const enableToggle = this.root.querySelector('#cl-overlay-wiz-enable');
+    const modeSelect = this.root.querySelector('#cl-overlay-wiz-mode');
+    const brightnessSlider = this.root.querySelector('#cl-overlay-wiz-brightness');
+    const brightnessVal = this.root.querySelector('#cl-overlay-wiz-brightness-val');
+    const pulseToggle = this.root.querySelector('#cl-overlay-wiz-pulse');
+    const btnTest = this.root.querySelector('#cl-overlay-btn-wiz-test');
+    const btnScan = this.root.querySelector('#cl-overlay-btn-wiz-scan');
+
+    if (!btnToggle || !popover) return;
+
+    // Toggle popover visibility
+    btnToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = popover.style.display !== 'none';
+      popover.style.display = isVisible ? 'none' : 'flex';
+      if (!isVisible) wizClient.checkBridge();
+    });
+
+    this.root.addEventListener('click', (e) => {
+      if (!popover.contains(e.target) && e.target !== btnToggle) {
+        popover.style.display = 'none';
+      }
+    });
+
+    // Handle Enable Switch
+    enableToggle.addEventListener('change', () => {
+      wizClient.isEnabled = enableToggle.checked;
+      wizClient.saveSettings();
+      if (wizClient.isEnabled && this.currentTrack) {
+        wizClient.syncTrack(this.currentTrack, this.artworkImg);
+      }
+    });
+
+    // Handle Mode Select
+    modeSelect.addEventListener('change', () => {
+      wizClient.mode = modeSelect.value;
+      wizClient.saveSettings();
+      if (wizClient.isEnabled && this.currentTrack) {
+        wizClient.syncTrack(this.currentTrack, this.artworkImg);
+      }
+    });
+
+    // Handle Brightness Slider
+    brightnessSlider.addEventListener('input', () => {
+      const val = parseInt(brightnessSlider.value, 10);
+      brightnessVal.textContent = `${val}%`;
+      wizClient.brightness = val;
+      wizClient.saveSettings();
+      if (wizClient.isEnabled) {
+        wizClient.sendPilot({ dimming: val });
+      }
+    });
+
+    // Handle Pulse Toggle
+    pulseToggle.addEventListener('change', () => {
+      wizClient.pulseOnLyric = pulseToggle.checked;
+      wizClient.saveSettings();
+    });
+
+    // Test Button
+    btnTest.addEventListener('click', async () => {
+      btnTest.textContent = 'Flashing...';
+      await wizClient.testFlash();
+      setTimeout(() => { btnTest.textContent = '✨ Test Flash'; }, 1200);
+    });
+
+    // Scan Button
+    btnScan.addEventListener('click', async () => {
+      btnScan.textContent = 'Scanning...';
+      await wizClient.triggerDiscovery();
+      btnScan.textContent = '🔍 Scan';
+    });
+
+    // Listen to WiZ client status updates
+    wizClient.addListener((state) => {
+      enableToggle.checked = state.isEnabled;
+      modeSelect.value = state.mode;
+      brightnessSlider.value = state.brightness;
+      brightnessVal.textContent = `${state.brightness}%`;
+      pulseToggle.checked = state.pulseOnLyric;
+
+      if (state.isBridgeOnline && state.activeBulb) {
+        statusBadge.textContent = state.activeBulb;
+        statusBadge.className = 'cl-wiz-chip online';
+        statusBadge.title = `WiZ bulb connected at ${state.activeBulb}`;
+        wizDot.className = state.isEnabled ? 'cl-wiz-status-dot active-sync' : 'cl-wiz-status-dot online';
+      } else if (state.isBridgeOnline) {
+        statusBadge.textContent = 'Bulb offline';
+        statusBadge.className = 'cl-wiz-chip';
+        wizDot.className = 'cl-wiz-status-dot';
+      } else {
+        statusBadge.textContent = 'Bridge offline';
+        statusBadge.className = 'cl-wiz-chip';
+        wizDot.className = 'cl-wiz-status-dot';
+        statusBadge.title = 'Run "node bridge/wiz-bridge.js" or start-bridge.bat';
+      }
+    });
   }
 
   scrollToActiveLine(smooth = true) {

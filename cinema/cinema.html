@@ -29,6 +29,59 @@
           <button class="cl-pill-btn" data-theme="neon">Cyber Neon</button>
         </div>
 
+        <!-- WiZ Smart Light Ambient Sync -->
+        <div class="cl-wiz-wrapper">
+          <button class="cl-pill-btn cl-wiz-btn" id="btn-wiz-toggle" title="Philips WiZ Smart Bulb Ambient Sync">
+            <span class="cl-wiz-status-dot" id="wiz-dot"></span>
+            <span>💡 WiZ Light</span>
+          </button>
+
+          <!-- WiZ Floating Popover Panel -->
+          <div class="cl-wiz-popover" id="wiz-popover" style="display: none;">
+            <div class="cl-wiz-header">
+              <span class="cl-wiz-title">💡 WiZ Room Sync</span>
+              <span class="cl-wiz-chip" id="wiz-status-badge">Checking...</span>
+            </div>
+
+            <div class="cl-wiz-row">
+              <span>Enable Sync</span>
+              <label class="cl-switch">
+                <input type="checkbox" id="wiz-enable-toggle">
+                <span class="cl-slider"></span>
+              </label>
+            </div>
+
+            <div class="cl-wiz-row">
+              <span>Lighting Mode</span>
+              <select id="wiz-mode-select" class="cl-select">
+                <option value="album">🎨 Album Art Vibrant</option>
+                <option value="neon">⚡ Cyber Neon</option>
+                <option value="aurora">🌌 Aurora Emerald</option>
+                <option value="warm">🕯️ Cozy Warm Studio</option>
+              </select>
+            </div>
+
+            <div class="cl-wiz-row">
+              <span>Brightness</span>
+              <input type="range" id="wiz-brightness-slider" min="10" max="100" value="85" class="cl-range">
+              <span id="wiz-brightness-val" style="font-size: 11px; width: 28px; text-align: right;">85%</span>
+            </div>
+
+            <div class="cl-wiz-row">
+              <span>Lyric Beat Pulse</span>
+              <label class="cl-switch">
+                <input type="checkbox" id="wiz-pulse-toggle" checked>
+                <span class="cl-slider"></span>
+              </label>
+            </div>
+
+            <div class="cl-wiz-footer">
+              <button class="cl-wiz-action-btn" id="btn-wiz-test">✨ Test Flash</button>
+              <button class="cl-wiz-action-btn" id="btn-wiz-scan">🔍 Scan</button>
+            </div>
+          </div>
+        </div>
+
         <button class="cl-icon-btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
@@ -99,6 +152,8 @@
   <script src="../utils/title-cleaner.js"></script>
   <script src="../utils/lrc-parser.js"></script>
   <script src="../utils/lyrics-api.js"></script>
+  <script src="../utils/color-extractor.js"></script>
+  <script src="../utils/wiz-client.js"></script>
   <script src="cinema.js"></script>
 </body>
 </html>

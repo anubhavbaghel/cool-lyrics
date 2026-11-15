@@ -82,6 +82,9 @@
       sendMediaAction('SEEK', { time: targetTime });
     });
 
+    // WiZ Smart Light Controls
+    initWizControls();
+
     // Offset tuner
     syncMinus.addEventListener('click', () => adjustOffset(-0.5));
     syncPlus.addEventListener('click', () => adjustOffset(0.5));
@@ -160,6 +163,11 @@
 
     if (track.artwork) {
       dockArt.src = track.artwork;
+    }
+
+    // Sync ambient WiZ light with track
+    if (typeof wizClient !== 'undefined') {
+      wizClient.syncTrack(track, dockArt);
     }
 
     if (lyrics) {
@@ -269,6 +277,10 @@
       if (!isUserScrolling) {
         scrollToActive(true);
       }
+      // Gentle pulse accent on WiZ smart bulb on line change
+      if (typeof wizClient !== 'undefined') {
+        wizClient.pulseActiveLine();
+      }
     }
   }
 
@@ -281,6 +293,112 @@
         block: 'center'
       });
     }
+  }
+
+  function initWizControls() {
+    if (typeof wizClient === 'undefined') return;
+
+    const btnToggle = document.getElementById('btn-wiz-toggle');
+    const popover = document.getElementById('wiz-popover');
+    const wizDot = document.getElementById('wiz-dot');
+    const statusBadge = document.getElementById('wiz-status-badge');
+    const enableToggle = document.getElementById('wiz-enable-toggle');
+    const modeSelect = document.getElementById('wiz-mode-select');
+    const brightnessSlider = document.getElementById('wiz-brightness-slider');
+    const brightnessVal = document.getElementById('wiz-brightness-val');
+    const pulseToggle = document.getElementById('wiz-pulse-toggle');
+    const btnTest = document.getElementById('btn-wiz-test');
+    const btnScan = document.getElementById('btn-wiz-scan');
+
+    if (!btnToggle || !popover) return;
+
+    // Toggle popover visibility
+    btnToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = popover.style.display !== 'none';
+      popover.style.display = isVisible ? 'none' : 'flex';
+      if (!isVisible) wizClient.checkBridge();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!popover.contains(e.target) && e.target !== btnToggle) {
+        popover.style.display = 'none';
+      }
+    });
+
+    // Handle Enable Switch
+    enableToggle.addEventListener('change', () => {
+      wizClient.isEnabled = enableToggle.checked;
+      wizClient.saveSettings();
+      if (wizClient.isEnabled && currentTrack) {
+        wizClient.syncTrack(currentTrack, dockArt);
+      }
+    });
+
+    // Handle Mode Select
+    modeSelect.addEventListener('change', () => {
+      wizClient.mode = modeSelect.value;
+      wizClient.saveSettings();
+      if (wizClient.isEnabled && currentTrack) {
+        wizClient.syncTrack(currentTrack, dockArt);
+      }
+    });
+
+    // Handle Brightness Slider
+    brightnessSlider.addEventListener('input', () => {
+      const val = parseInt(brightnessSlider.value, 10);
+      brightnessVal.textContent = `${val}%`;
+      wizClient.brightness = val;
+      wizClient.saveSettings();
+      if (wizClient.isEnabled) {
+        wizClient.sendPilot({ dimming: val });
+      }
+    });
+
+    // Handle Pulse Toggle
+    pulseToggle.addEventListener('change', () => {
+      wizClient.pulseOnLyric = pulseToggle.checked;
+      wizClient.saveSettings();
+    });
+
+    // Test Button
+    btnTest.addEventListener('click', async () => {
+      btnTest.textContent = 'Flashing...';
+      await wizClient.testFlash();
+      setTimeout(() => { btnTest.textContent = '✨ Test Flash'; }, 1200);
+    });
+
+    // Scan Button
+    btnScan.addEventListener('click', async () => {
+      btnScan.textContent = 'Scanning...';
+      await wizClient.triggerDiscovery();
+      btnScan.textContent = '🔍 Scan';
+    });
+
+    // Listen to WiZ client status updates
+    wizClient.addListener((state) => {
+      enableToggle.checked = state.isEnabled;
+      modeSelect.value = state.mode;
+      brightnessSlider.value = state.brightness;
+      brightnessVal.textContent = `${state.brightness}%`;
+      pulseToggle.checked = state.pulseOnLyric;
+
+      if (state.isBridgeOnline && state.activeBulb) {
+        statusBadge.textContent = state.activeBulb;
+        statusBadge.className = 'cl-wiz-chip online';
+        statusBadge.title = `WiZ bulb connected at ${state.activeBulb}`;
+        wizDot.className = state.isEnabled ? 'cl-wiz-status-dot active-sync' : 'cl-wiz-status-dot online';
+      } else if (state.isBridgeOnline) {
+        statusBadge.textContent = 'Bulb offline';
+        statusBadge.className = 'cl-wiz-chip';
+        wizDot.className = 'cl-wiz-status-dot';
+      } else {
+        statusBadge.textContent = 'Bridge offline';
+        statusBadge.className = 'cl-wiz-chip';
+        wizDot.className = 'cl-wiz-status-dot';
+        statusBadge.title = 'Run "node bridge/wiz-bridge.js" or start-bridge.bat';
+      }
+    });
   }
 
   function sendMediaAction(action, data = {}) {
