@@ -41,8 +41,7 @@ body, html {
 body.cl-vibe-reel {
   --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.45);
-  --highlight-bg: rgba(0, 240, 255, 0.16);
+  --glow-color: rgba(0, 240, 255, 0.8);
   --skew: 0deg;
 }
 
@@ -50,8 +49,7 @@ body.cl-vibe-reel {
 body.cl-vibe-slanted {
   --font-lyric: 'Bebas Neue', 'Syne', sans-serif;
   --accent-color: #ff0055;
-  --glow-color: rgba(255, 0, 85, 0.6);
-  --highlight-bg: rgba(255, 0, 85, 0.2);
+  --glow-color: rgba(255, 0, 85, 0.85);
   --skew: -6deg;
 }
 
@@ -63,8 +61,7 @@ body.cl-vibe-slanted .cl-bouncy-word {
 body.cl-vibe-editorial {
   --font-lyric: 'Playfair Display', serif;
   --accent-color: #fbbf24;
-  --glow-color: rgba(251, 191, 36, 0.45);
-  --highlight-bg: rgba(251, 191, 36, 0.15);
+  --glow-color: rgba(251, 191, 36, 0.75);
   --skew: 0deg;
 }
 
@@ -76,8 +73,7 @@ body.cl-vibe-editorial .cl-bouncy-word.active {
 body.cl-vibe-cyber {
   --font-lyric: 'Space Grotesk', monospace;
   --accent-color: #10b981;
-  --glow-color: rgba(16, 185, 129, 0.55);
-  --highlight-bg: rgba(16, 185, 129, 0.16);
+  --glow-color: rgba(16, 185, 129, 0.8);
   --skew: 0deg;
 }
 
@@ -85,8 +81,7 @@ body.cl-vibe-cyber {
 body.cl-vibe-classic {
   --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #ffffff;
-  --glow-color: rgba(255, 255, 255, 0.3);
-  --highlight-bg: rgba(255, 255, 255, 0.1);
+  --glow-color: rgba(255, 255, 255, 0.7);
   --skew: 0deg;
 }
 
@@ -324,45 +319,61 @@ body.cl-vibe-classic {
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* The Individual Words Inside the Active Line (Completely Boxless & Pure Text Highlight) */
 .cl-bouncy-word {
   display: inline-block;
-  padding: 4px 14px;
-  border-radius: 14px;
+  padding: 0 4px;
   cursor: pointer;
   position: relative;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   color: var(--text-idle);
-  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), background 0.25s ease;
-  will-change: transform, color;
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), text-shadow 0.25s ease;
+  will-change: transform, color, text-shadow;
 }
 
+/* When the Singer sings this Word: Luminous Text Highlight with Bouncy Spring Pop */
 .cl-bouncy-word.active {
-  color: #ffffff;
-  background: var(--highlight-bg);
-  box-shadow: 0 0 30px var(--glow-color), 0 0 60px var(--glow-color);
+  color: #ffffff !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   font-weight: 900;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 16px var(--glow-color), 0 0 32px var(--glow-color), 0 0 60px var(--accent-color);
   animation: insta-word-pop 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
 
 @keyframes insta-word-pop {
-  0% { transform: scale(0.90) translateY(4px); }
-  50% { transform: scale(1.15) translateY(-2px); }
-  100% { transform: scale(1.08) translateY(0); }
+  0% { transform: scale(0.92) translateY(2px); }
+  50% { transform: scale(1.18) translateY(-4px); }
+  100% { transform: scale(1.10) translateY(-2px); }
 }
 
+/* Words that have already passed in the phrase */
 .cl-bouncy-word.passed {
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.84);
   transform: scale(1);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
 }
 
+/* Upcoming words in the line */
 .cl-bouncy-word.upcoming {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.40);
   transform: scale(1);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: none;
 }
 
 .cl-bouncy-word:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: transparent !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.6);
 }
 
 .cl-bouncy-next {
