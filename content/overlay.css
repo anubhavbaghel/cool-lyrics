@@ -1,6 +1,6 @@
 /* Cool Lyrics - Instagram Story Bouncy Lyrics Styling */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@400;700;900&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --cl-bg: #000000;
@@ -9,9 +9,10 @@
   --cl-text-prev: rgba(255, 255, 255, 0.22);
   --cl-text-next: rgba(255, 255, 255, 0.22);
   --cl-accent: #00f0ff;
-  --cl-glow: rgba(0, 240, 255, 0.8);
-  --cl-font-lyric: 'Syne', 'Impact', sans-serif;
-  --cl-font-meta: 'Outfit', 'Inter', -apple-system, sans-serif;
+  --cl-glow: rgba(0, 240, 255, 0.5);
+  --cl-highlight-bg: rgba(255, 255, 255, 0.14);
+  --cl-font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --cl-font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --cl-skew: 0deg;
 }
 
@@ -40,54 +41,54 @@
 }
 
 /* ===================================================
-   GENRE / VIBE THEMES (ARTISTIC BOLD TYPOGRAPHY)
+   GENRE / VIBE THEMES (INSTAGRAM STICKER STYLES)
    =================================================== */
 
-/* 1. 📸 Insta Bouncy (Bold Editorial Punch) */
+/* 1. 📸 Insta Bouncy (Classic Clean Pop Reel) */
 #cool-lyrics-root.cl-vibe-reel {
-  --cl-font-lyric: 'Syne', 'Impact', sans-serif;
+  --cl-font-lyric: 'Plus Jakarta Sans', sans-serif;
   --cl-accent: #00f0ff;
-  --cl-glow: rgba(0, 240, 255, 0.85);
+  --cl-glow: rgba(0, 240, 255, 0.8);
   --cl-skew: 0deg;
 }
 
 /* 2. 💥 Street Drill (Rap / Drill Slanted Punch) */
 #cool-lyrics-root.cl-vibe-slanted {
-  --cl-font-lyric: 'Syne', 'Impact', sans-serif;
+  --cl-font-lyric: 'Bebas Neue', 'Syne', sans-serif;
   --cl-accent: #ff0055;
-  --cl-glow: rgba(255, 0, 85, 0.9);
+  --cl-glow: rgba(255, 0, 85, 0.85);
   --cl-skew: -6deg;
 }
 
 #cool-lyrics-root.cl-vibe-slanted .cl-bouncy-word {
-  letter-spacing: -0.01em;
+  letter-spacing: 0.03em;
 }
 
 /* 3. 🍷 Editorial Vinyl (Soul / R&B / Ballads) */
 #cool-lyrics-root.cl-vibe-editorial {
-  --cl-font-lyric: 'Cinzel Decorative', 'Georgia', serif;
-  --cl-accent: #e2b170;
-  --cl-glow: rgba(226, 177, 112, 0.8);
+  --cl-font-lyric: 'Playfair Display', serif;
+  --cl-accent: #fbbf24;
+  --cl-glow: rgba(251, 191, 36, 0.75);
   --cl-skew: 0deg;
 }
 
 #cool-lyrics-root.cl-vibe-editorial .cl-bouncy-word.active {
-  font-style: normal;
+  font-style: italic;
 }
 
 /* 4. ⚡ Cyber Matrix (EDM / Synth) */
 #cool-lyrics-root.cl-vibe-cyber {
-  --cl-font-lyric: 'Unbounded', 'Courier New', monospace;
+  --cl-font-lyric: 'Space Grotesk', monospace;
   --cl-accent: #10b981;
-  --cl-glow: rgba(16, 185, 129, 0.85);
+  --cl-glow: rgba(16, 185, 129, 0.8);
   --cl-skew: 0deg;
 }
 
 /* 5. 📜 Pure Studio */
 #cool-lyrics-root.cl-vibe-classic {
-  --cl-font-lyric: 'Outfit', sans-serif;
+  --cl-font-lyric: 'Plus Jakarta Sans', sans-serif;
   --cl-accent: #ffffff;
-  --cl-glow: rgba(255, 255, 255, 0.75);
+  --cl-glow: rgba(255, 255, 255, 0.7);
   --cl-skew: 0deg;
 }
 
@@ -294,30 +295,30 @@
 /* Previous Line: Glides Up & Fades Out */
 .cl-bouncy-prev {
   font-family: var(--cl-font-lyric);
-  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 600;
   line-height: 1.35;
   color: var(--cl-text-prev);
   filter: blur(1px);
   transform: translateY(-8px);
-  opacity: 0.42;
+  opacity: 0.45;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  max-width: 1000px;
+  max-width: 900px;
 }
 
 /* Center Stage: Active Bouncy Line */
 .cl-bouncy-active {
   font-family: var(--cl-font-lyric);
-  font-size: clamp(3.4rem, 6.8vw, 6.5rem);
-  font-weight: 900;
-  line-height: 1.22;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.6rem, 5.2vw, 4.8rem);
+  font-weight: 800;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 14px 22px;
-  max-width: 1250px;
+  gap: 12px 18px;
+  max-width: 1100px;
   padding: 14px 24px;
   border-radius: 28px;
   position: relative;
@@ -394,15 +395,15 @@
 /* Upcoming Line: Waiting Below */
 .cl-bouncy-next {
   font-family: var(--cl-font-lyric);
-  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 600;
   line-height: 1.35;
   color: var(--cl-text-next);
   filter: blur(1px);
   transform: translateY(8px);
-  opacity: 0.42;
+  opacity: 0.45;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  max-width: 1000px;
+  max-width: 900px;
 }
 
 /* ===================================================

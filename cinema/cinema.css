@@ -1,6 +1,6 @@
 /* Cool Lyrics - Cinema Standalone Instagram Story Bouncy Lyrics Styling */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@400;700;900&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --bg-color: #000000;
@@ -9,9 +9,10 @@
   --text-prev: rgba(255, 255, 255, 0.22);
   --text-next: rgba(255, 255, 255, 0.22);
   --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.8);
-  --font-lyric: 'Syne', 'Impact', sans-serif;
-  --font-meta: 'Outfit', 'Inter', -apple-system, sans-serif;
+  --glow-color: rgba(0, 240, 255, 0.5);
+  --highlight-bg: rgba(255, 255, 255, 0.14);
+  --font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --skew: 0deg;
 }
 
@@ -33,54 +34,54 @@ body, html {
 }
 
 /* ===================================================
-   GENRE / VIBE THEMES (ARTISTIC BOLD TYPOGRAPHY)
+   GENRE / VIBE THEMES
    =================================================== */
 
 /* 1. 📸 Insta Bouncy */
 body.cl-vibe-reel {
-  --font-lyric: 'Syne', 'Impact', sans-serif;
+  --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.85);
+  --glow-color: rgba(0, 240, 255, 0.8);
   --skew: 0deg;
 }
 
 /* 2. 💥 Street Drill */
 body.cl-vibe-slanted {
-  --font-lyric: 'Syne', 'Impact', sans-serif;
+  --font-lyric: 'Bebas Neue', 'Syne', sans-serif;
   --accent-color: #ff0055;
-  --glow-color: rgba(255, 0, 85, 0.9);
+  --glow-color: rgba(255, 0, 85, 0.85);
   --skew: -6deg;
 }
 
-#cool-lyrics-root.cl-vibe-slanted .cl-bouncy-word {
-  letter-spacing: -0.01em;
+body.cl-vibe-slanted .cl-bouncy-word {
+  letter-spacing: 0.03em;
 }
 
 /* 3. 🍷 Editorial Vinyl */
 body.cl-vibe-editorial {
-  --font-lyric: 'Cinzel Decorative', 'Georgia', serif;
-  --accent-color: #e2b170;
-  --glow-color: rgba(226, 177, 112, 0.8);
+  --font-lyric: 'Playfair Display', serif;
+  --accent-color: #fbbf24;
+  --glow-color: rgba(251, 191, 36, 0.75);
   --skew: 0deg;
 }
 
 body.cl-vibe-editorial .cl-bouncy-word.active {
-  font-style: normal;
+  font-style: italic;
 }
 
 /* 4. ⚡ Cyber Matrix */
 body.cl-vibe-cyber {
-  --font-lyric: 'Unbounded', 'Courier New', monospace;
+  --font-lyric: 'Space Grotesk', monospace;
   --accent-color: #10b981;
-  --glow-color: rgba(16, 185, 129, 0.85);
+  --glow-color: rgba(16, 185, 129, 0.8);
   --skew: 0deg;
 }
 
 /* 5. 📜 Pure Studio */
 body.cl-vibe-classic {
-  --font-lyric: 'Outfit', sans-serif;
+  --font-lyric: 'Plus Jakarta Sans', sans-serif;
   --accent-color: #ffffff;
-  --glow-color: rgba(255, 255, 255, 0.75);
+  --glow-color: rgba(255, 255, 255, 0.7);
   --skew: 0deg;
 }
 
@@ -281,29 +282,29 @@ body.cl-vibe-classic {
 
 .cl-bouncy-prev {
   font-family: var(--font-lyric);
-  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 600;
   line-height: 1.35;
   color: var(--text-prev);
   filter: blur(1px);
   transform: translateY(-8px);
-  opacity: 0.42;
+  opacity: 0.45;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  max-width: 1000px;
+  max-width: 950px;
 }
 
 .cl-bouncy-active {
   font-family: var(--font-lyric);
-  font-size: clamp(3.4rem, 6.8vw, 6.5rem);
-  font-weight: 900;
-  line-height: 1.22;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.8rem, 5.5vw, 5.2rem);
+  font-weight: 800;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 14px 22px;
-  max-width: 1250px;
+  gap: 14px 20px;
+  max-width: 1150px;
   padding: 14px 24px;
   border-radius: 28px;
   transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
@@ -377,15 +378,15 @@ body.cl-vibe-classic {
 
 .cl-bouncy-next {
   font-family: var(--font-lyric);
-  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 600;
   line-height: 1.35;
   color: var(--text-next);
   filter: blur(1px);
   transform: translateY(8px);
-  opacity: 0.42;
+  opacity: 0.45;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  max-width: 1000px;
+  max-width: 950px;
 }
 
 /* ===================================================
