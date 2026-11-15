@@ -1,19 +1,13 @@
-/* Cool Lyrics - Cinema Standalone Instagram Story Bouncy Lyrics Styling */
-
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
+/* Cool Lyrics - Cinema Standalone Mode Styling */
 
 :root {
   --bg-color: #000000;
   --text-active: #ffffff;
-  --text-idle: rgba(255, 255, 255, 0.72);
-  --text-prev: rgba(255, 255, 255, 0.22);
-  --text-next: rgba(255, 255, 255, 0.22);
-  --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.5);
-  --highlight-bg: rgba(255, 255, 255, 0.14);
-  --font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  --font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  --skew: 0deg;
+  --text-dimmed: rgba(255, 255, 255, 0.22);
+  --text-hover: rgba(255, 255, 255, 0.7);
+  --accent-cyan: #00f0ff;
+  --accent-pink: #ec4899;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "SF Pro Display", sans-serif;
 }
 
 * {
@@ -27,62 +21,10 @@ body, html {
   height: 100%;
   background-color: var(--bg-color);
   color: var(--text-active);
-  font-family: var(--font-meta);
+  font-family: var(--font-family);
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
-}
-
-/* ===================================================
-   GENRE / VIBE THEMES
-   =================================================== */
-
-/* 1. 📸 Insta Bouncy */
-body.cl-vibe-reel {
-  --font-lyric: 'Plus Jakarta Sans', sans-serif;
-  --accent-color: #00f0ff;
-  --glow-color: rgba(0, 240, 255, 0.8);
-  --skew: 0deg;
-}
-
-/* 2. 💥 Street Drill */
-body.cl-vibe-slanted {
-  --font-lyric: 'Bebas Neue', 'Syne', sans-serif;
-  --accent-color: #ff0055;
-  --glow-color: rgba(255, 0, 85, 0.85);
-  --skew: -6deg;
-}
-
-body.cl-vibe-slanted .cl-bouncy-word {
-  letter-spacing: 0.03em;
-}
-
-/* 3. 🍷 Editorial Vinyl */
-body.cl-vibe-editorial {
-  --font-lyric: 'Playfair Display', serif;
-  --accent-color: #fbbf24;
-  --glow-color: rgba(251, 191, 36, 0.75);
-  --skew: 0deg;
-}
-
-body.cl-vibe-editorial .cl-bouncy-word.active {
-  font-style: italic;
-}
-
-/* 4. ⚡ Cyber Matrix */
-body.cl-vibe-cyber {
-  --font-lyric: 'Space Grotesk', monospace;
-  --accent-color: #10b981;
-  --glow-color: rgba(16, 185, 129, 0.8);
-  --skew: 0deg;
-}
-
-/* 5. 📜 Pure Studio */
-body.cl-vibe-classic {
-  --font-lyric: 'Plus Jakarta Sans', sans-serif;
-  --accent-color: #ffffff;
-  --glow-color: rgba(255, 255, 255, 0.7);
-  --skew: 0deg;
 }
 
 .cl-cinema-root {
@@ -94,38 +36,48 @@ body.cl-vibe-classic {
   background-color: #000000;
 }
 
-/* Backdrop Radial Glow */
+/* Ambient Aura Glow Layer */
 .cl-aura-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.cl-radial-glow {
+.cl-theme-aurora .cl-aura-bg {
+  opacity: 0.16;
+}
+
+.cl-glow-orb {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 65vw;
-  height: 65vw;
-  transform: translate(-50%, -50%);
   border-radius: 50%;
-  filter: blur(150px);
-  background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 65%);
-  opacity: 0.28;
-  transition: opacity 0.5s ease;
-  will-change: transform, opacity;
+  filter: blur(140px);
 }
 
-.cl-glow-pulse {
-  animation: aura-beat 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+.cl-orb-1 {
+  width: 50vw;
+  height: 50vw;
+  top: 10%;
+  left: 15%;
+  background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
+  animation: orb-drift 20s infinite alternate ease-in-out;
 }
 
-@keyframes aura-beat {
-  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.22; }
-  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.55; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.28; }
+.cl-orb-2 {
+  width: 45vw;
+  height: 45vw;
+  bottom: 10%;
+  right: 15%;
+  background: radial-gradient(circle, var(--accent-pink), transparent 70%);
+  animation: orb-drift 18s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes orb-drift {
+  0% { transform: translate(-10%, -10%) scale(0.9); }
+  100% { transform: translate(15%, 15%) scale(1.15); }
 }
 
 /* Top Navigation Bar */
@@ -139,7 +91,7 @@ body.cl-vibe-classic {
   justify-content: space-between;
   align-items: center;
   padding: 24px 40px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -175,60 +127,33 @@ body.cl-vibe-classic {
 .cl-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-/* Vibe Selector */
-.cl-vibe-selector {
+.cl-theme-selector {
   display: flex;
   background: rgba(255, 255, 255, 0.06);
   padding: 3px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
 }
 
 .cl-pill-btn {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.cl-pill-btn:hover {
-  color: #ffffff;
 }
 
 .cl-pill-btn.active {
-  background: #ffffff;
-  color: #000000;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-.cl-mode-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 7px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
-}
-
-.cl-mode-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 .cl-icon-btn {
@@ -250,149 +175,7 @@ body.cl-vibe-classic {
   transform: scale(1.05);
 }
 
-/* ===================================================
-   INSTAGRAM STORY BOUNCY STAGE
-   =================================================== */
-
-.cl-bouncy-stage {
-  position: relative;
-  z-index: 10;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8vw;
-  text-align: center;
-  overflow: hidden;
-}
-
-.cl-bouncy-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 34px;
-  transform: skewX(var(--skew));
-  transition: transform 0.35s ease;
-}
-
-.cl-bouncy-prev {
-  font-family: var(--font-lyric);
-  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--text-prev);
-  filter: blur(1px);
-  transform: translateY(-8px);
-  opacity: 0.45;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  max-width: 950px;
-}
-
-.cl-bouncy-active {
-  font-family: var(--font-lyric);
-  font-size: clamp(2.8rem, 5.5vw, 5.2rem);
-  font-weight: 800;
-  line-height: 1.32;
-  letter-spacing: -0.025em;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 14px 20px;
-  max-width: 1150px;
-  padding: 14px 24px;
-  border-radius: 28px;
-  transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-}
-
-.cl-line-slide-in {
-  animation: line-rise 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-@keyframes line-rise {
-  0% { transform: translateY(28px) scale(0.95); opacity: 0.3; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-/* The Individual Words Inside the Active Line (Completely Boxless & Pure Text Highlight) */
-.cl-bouncy-word {
-  display: inline-block;
-  padding: 0 4px;
-  cursor: pointer;
-  position: relative;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: var(--text-idle);
-  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), text-shadow 0.25s ease;
-  will-change: transform, color, text-shadow;
-}
-
-/* When the Singer sings this Word: Luminous Text Highlight with Bouncy Spring Pop */
-.cl-bouncy-word.active {
-  color: #ffffff !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  font-weight: 900;
-  text-shadow: 0 0 16px var(--glow-color), 0 0 32px var(--glow-color), 0 0 60px var(--accent-color);
-  animation: insta-word-pop 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-@keyframes insta-word-pop {
-  0% { transform: scale(0.92) translateY(2px); }
-  50% { transform: scale(1.18) translateY(-4px); }
-  100% { transform: scale(1.10) translateY(-2px); }
-}
-
-/* Words that have already passed in the phrase */
-.cl-bouncy-word.passed {
-  color: rgba(255, 255, 255, 0.84);
-  transform: scale(1);
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
-}
-
-/* Upcoming words in the line */
-.cl-bouncy-word.upcoming {
-  color: rgba(255, 255, 255, 0.40);
-  transform: scale(1);
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  text-shadow: none;
-}
-
-.cl-bouncy-word:hover {
-  background: transparent !important;
-  color: #ffffff !important;
-  text-shadow: 0 0 18px rgba(255, 255, 255, 0.6);
-}
-
-.cl-bouncy-next {
-  font-family: var(--font-lyric);
-  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--text-next);
-  filter: blur(1px);
-  transform: translateY(8px);
-  opacity: 0.45;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  max-width: 950px;
-}
-
-/* ===================================================
-   WATERFALL SCROLL
-   =================================================== */
-
+/* Stage & Lyrics */
 .cl-stage {
   position: relative;
   z-index: 10;
@@ -402,7 +185,7 @@ body.cl-vibe-classic {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 42vh 8vw;
+  padding: 42vh 8vw 42vh 8vw;
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
@@ -416,20 +199,19 @@ body.cl-vibe-classic {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 980px;
+  max-width: 950px;
 }
 
 .cl-line-item {
   margin: 18px 0;
   padding: 12px 28px;
   border-radius: 18px;
-  font-family: var(--font-lyric);
   font-size: 2.3rem;
-  line-height: 1.35;
-  font-weight: 700;
+  line-height: 1.4;
+  font-weight: 600;
   letter-spacing: -0.02em;
   text-align: center;
-  color: rgba(255, 255, 255, 0.24);
+  color: var(--text-dimmed);
   filter: blur(0.7px);
   transform: scale(0.96);
   cursor: pointer;
@@ -438,18 +220,24 @@ body.cl-vibe-classic {
 }
 
 .cl-line-item:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-hover);
   filter: blur(0);
   background: rgba(255, 255, 255, 0.04);
 }
 
 .cl-line-item.active {
   color: #ffffff;
-  font-size: 2.85rem;
-  font-weight: 900;
+  font-size: 2.75rem;
+  font-weight: 800;
   filter: blur(0);
   transform: scale(1.06);
-  text-shadow: 0 0 35px var(--glow-color);
+  text-shadow: 0 0 28px rgba(255, 255, 255, 0.4);
+}
+
+/* Theme: Cyber Neon */
+.cl-theme-neon .cl-line-item.active {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.9), 0 0 45px rgba(0, 240, 255, 0.5);
 }
 
 /* Empty State */
@@ -466,7 +254,7 @@ body.cl-vibe-classic {
   width: 52px;
   height: 52px;
   border: 3px solid rgba(255, 255, 255, 0.12);
-  border-top-color: var(--accent-color);
+  border-top-color: var(--accent-cyan);
   border-radius: 50%;
   animation: spin 1s infinite linear;
 }
@@ -521,7 +309,7 @@ body.cl-vibe-classic {
 .cl-dock-art {
   width: 50px;
   height: 50px;
-  border-radius: 12px;
+  border-radius: 10px;
   object-fit: cover;
   background: #111;
   box-shadow: 0 6px 18px rgba(0,0,0,0.8);
@@ -534,7 +322,6 @@ body.cl-vibe-classic {
 }
 
 .cl-dock-title {
-  font-family: var(--font-lyric);
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;
@@ -626,11 +413,15 @@ body.cl-vibe-classic {
 
 .cl-scrubber-fill {
   height: 100%;
-  background: var(--accent-color);
-  box-shadow: 0 0 10px var(--glow-color);
+  background: #ffffff;
   border-radius: 999px;
   width: 0%;
   transition: width 0.1s linear;
+}
+
+.cl-theme-neon .cl-scrubber-fill {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
 }
 
 .cl-dock-tools {

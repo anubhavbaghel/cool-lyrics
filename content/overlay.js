@@ -1,6 +1,5 @@
 /**
- * Cool Lyrics - Instagram Story Bouncy Lyrics Overlay Component
- * Features rhythmic phrase slide-up, bouncy spring word highlights, and full context.
+ * Cool Lyrics - In-Page Pitch Black Cinema Overlay Component
  */
 
 class LyricsOverlay {
@@ -13,14 +12,10 @@ class LyricsOverlay {
 
     this.isVisible = false;
     this.currentTrack = null;
-    this.lyricsData = null;
+    this.lyricsData = null; // { lines: [], isSynced: boolean }
     this.activeLineIndex = -1;
-    this.activeWordIndex = -1;
-    this.userOffset = 0;
-    
-    this.displayMode = 'bouncy'; // 'bouncy' (Instagram Story) or 'waterfall' (Classic Scroll)
-    this.currentVibe = 'reel';   // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
-
+    this.userOffset = 0; // seconds
+    this.theme = 'pure-black'; // 'pure-black', 'ambient', 'neon'
     this.idleTimer = null;
     this.isUserScrolling = false;
     this.userScrollResumeTimer = null;
@@ -33,10 +28,9 @@ class LyricsOverlay {
 
     const root = document.createElement('div');
     root.id = 'cool-lyrics-root';
-    root.className = `cl-vibe-${this.currentVibe}`;
     root.innerHTML = `
       <div class="cl-bg-layer">
-        <div class="cl-bg-glow" id="cl-radial-glow"></div>
+        <div class="cl-bg-glow"></div>
       </div>
 
       <!-- Header -->
@@ -50,19 +44,10 @@ class LyricsOverlay {
         </div>
 
         <div class="cl-header-actions">
-          <!-- Vibe Selector -->
-          <div class="cl-vibe-pill-group" id="cl-vibe-selector">
-            <button class="cl-vibe-pill active" data-vibe="reel">📸 Reel</button>
-            <button class="cl-vibe-pill" data-vibe="slanted">💥 Drill</button>
-            <button class="cl-vibe-pill" data-vibe="editorial">🍷 Vinyl</button>
-            <button class="cl-vibe-pill" data-vibe="cyber">⚡ Matrix</button>
-            <button class="cl-vibe-pill" data-vibe="classic">📜 Scroll</button>
-          </div>
-
-          <button class="cl-btn" id="cl-btn-mode" title="Toggle Display Mode (V)">
-            <span id="cl-mode-icon">✨</span> <span id="cl-mode-text">Bouncy Reel</span>
+          <button class="cl-btn" id="cl-btn-theme" title="Cycle visual theme">
+            <span>✨</span> <span id="cl-theme-name">Pitch Black</span>
           </button>
-          <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Standalone Window">
+          <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Open in Standalone Cinema Window">
             <span>⧉</span>
           </button>
           <button class="cl-btn cl-btn-icon" id="cl-btn-fullscreen" title="Fullscreen (F)">
@@ -74,19 +59,8 @@ class LyricsOverlay {
         </div>
       </header>
 
-      <!-- Stage 1: Instagram Story Bouncy Lyrics Stage -->
-      <main class="cl-bouncy-stage" id="cl-bouncy-stage">
-        <div class="cl-bouncy-wrapper">
-          <div class="cl-bouncy-prev" id="cl-bouncy-prev"></div>
-          <div class="cl-bouncy-active" id="cl-bouncy-active">
-            <span class="cl-bouncy-word active">READY</span>
-          </div>
-          <div class="cl-bouncy-next" id="cl-bouncy-next"></div>
-        </div>
-      </main>
-
-      <!-- Stage 2: Classic Waterfall Scroll Container -->
-      <main class="cl-lyrics-container" id="cl-lyrics-scroll" style="display: none;">
+      <!-- Center Lyrics Scroll Container -->
+      <main class="cl-lyrics-container" id="cl-lyrics-scroll">
         <div class="cl-status-view">
           <div class="cl-spinner"></div>
           <span>Waiting for track to start...</span>
@@ -119,7 +93,7 @@ class LyricsOverlay {
           </div>
 
           <div style="font-size: 0.8rem; color: rgba(255,255,255,0.4);">
-            <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">V</kbd> Mode &nbsp;•&nbsp; <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Esc</kbd> Exit
+            <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Esc</kbd> Exit
           </div>
         </div>
       </footer>
@@ -128,15 +102,9 @@ class LyricsOverlay {
     document.body.appendChild(root);
     this.root = root;
 
-    // Elements
+    // Cache elements
     this.header = root.querySelector('.cl-header');
     this.footer = root.querySelector('.cl-footer');
-    this.bouncyStage = root.querySelector('#cl-bouncy-stage');
-    this.bouncyPrevEl = root.querySelector('#cl-bouncy-prev');
-    this.bouncyActiveEl = root.querySelector('#cl-bouncy-active');
-    this.bouncyNextEl = root.querySelector('#cl-bouncy-next');
-    this.radialGlow = root.querySelector('#cl-radial-glow');
-
     this.lyricsContainer = root.querySelector('#cl-lyrics-scroll');
     this.artworkImg = root.querySelector('.cl-artwork');
     this.titleEl = root.querySelector('.cl-track-title');
@@ -146,17 +114,18 @@ class LyricsOverlay {
     this.progressBar = root.querySelector('#cl-progress-bar');
     this.progressFill = root.querySelector('#cl-progress-fill');
     this.playBtn = root.querySelector('#cl-btn-play');
+    this.themeName = root.querySelector('#cl-theme-name');
     this.offsetVal = root.querySelector('#cl-offset-val');
-    this.modeBtn = root.querySelector('#cl-btn-mode');
-    this.modeIcon = root.querySelector('#cl-mode-icon');
-    this.modeText = root.querySelector('#cl-mode-text');
 
     this.bindEvents();
   }
 
   bindEvents() {
+    // Close & Popout
     this.root.querySelector('#cl-btn-close').addEventListener('click', () => this.hide());
     this.root.querySelector('#cl-btn-popout').addEventListener('click', () => this.onOpenCinemaTab());
+
+    // Fullscreen
     this.root.querySelector('#cl-btn-fullscreen').addEventListener('click', () => this.toggleFullscreen());
 
     // Playback buttons
@@ -164,15 +133,8 @@ class LyricsOverlay {
     this.root.querySelector('#cl-btn-prev').addEventListener('click', () => this.onPrev());
     this.root.querySelector('#cl-btn-next').addEventListener('click', () => this.onNext());
 
-    // Mode toggle
-    this.modeBtn.addEventListener('click', () => this.toggleDisplayMode());
-
-    // Vibe buttons
-    this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.setVibe(btn.dataset.vibe);
-      });
-    });
+    // Theme cycle
+    this.root.querySelector('#cl-btn-theme').addEventListener('click', () => this.cycleTheme());
 
     // Offset tuner
     this.root.querySelector('#cl-offset-minus').addEventListener('click', () => this.adjustOffset(-0.5));
@@ -187,7 +149,7 @@ class LyricsOverlay {
       this.onSeek(pos * this.currentTrack.duration);
     });
 
-    // Manual scroll pause for waterfall
+    // Handle manual scrolling pause/resume
     this.lyricsContainer.addEventListener('wheel', () => {
       this.isUserScrolling = true;
       clearTimeout(this.userScrollResumeTimer);
@@ -197,10 +159,10 @@ class LyricsOverlay {
       }, 3500);
     }, { passive: true });
 
-    // Idle auto-hide
+    // Auto-hide controls when mouse is idle
     this.root.addEventListener('mousemove', () => this.resetIdleTimer());
 
-    // Hotkeys inside overlay
+    // Keyboard shortcuts inside overlay
     window.addEventListener('keydown', (e) => {
       if (!this.isVisible) return;
       if (e.key === 'Escape') {
@@ -210,43 +172,8 @@ class LyricsOverlay {
         this.onTogglePlay();
       } else if (e.key === 'f' || e.key === 'F') {
         this.toggleFullscreen();
-      } else if (e.key === 'v' || e.key === 'V') {
-        this.toggleDisplayMode();
       }
     });
-  }
-
-  setVibe(vibe) {
-    this.currentVibe = vibe;
-    this.root.className = `cl-visible cl-vibe-${vibe}`;
-
-    this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.vibe === vibe);
-    });
-
-    if (vibe === 'classic') {
-      this.setDisplayMode('waterfall');
-    }
-  }
-
-  toggleDisplayMode() {
-    this.setDisplayMode(this.displayMode === 'bouncy' ? 'waterfall' : 'bouncy');
-  }
-
-  setDisplayMode(mode) {
-    this.displayMode = mode;
-    if (mode === 'bouncy') {
-      this.bouncyStage.style.display = 'flex';
-      this.lyricsContainer.style.display = 'none';
-      this.modeIcon.textContent = '✨';
-      this.modeText.textContent = 'Bouncy Reel';
-    } else {
-      this.bouncyStage.style.display = 'none';
-      this.lyricsContainer.style.display = 'flex';
-      this.modeIcon.textContent = '📜';
-      this.modeText.textContent = 'Waterfall';
-      this.scrollToActiveLine(false);
-    }
   }
 
   resetIdleTimer() {
@@ -265,9 +192,7 @@ class LyricsOverlay {
     this.isVisible = true;
     this.root.classList.add('cl-visible');
     this.resetIdleTimer();
-    if (this.displayMode === 'waterfall') {
-      this.scrollToActiveLine(false);
-    }
+    this.scrollToActiveLine(false);
   }
 
   hide() {
@@ -294,6 +219,23 @@ class LyricsOverlay {
     }
   }
 
+  cycleTheme() {
+    const themes = ['pure-black', 'ambient', 'neon'];
+    const names = {
+      'pure-black': 'Pitch Black',
+      'ambient': 'Aurora Glow',
+      'neon': 'Cyber Neon'
+    };
+    const nextIdx = (themes.indexOf(this.theme) + 1) % themes.length;
+    this.theme = themes[nextIdx];
+
+    this.root.classList.remove('cl-theme-ambient', 'cl-theme-neon');
+    if (this.theme === 'ambient') this.root.classList.add('cl-theme-ambient');
+    if (this.theme === 'neon') this.root.classList.add('cl-theme-neon');
+
+    this.themeName.textContent = names[this.theme];
+  }
+
   adjustOffset(delta) {
     this.setOffset(Math.round((this.userOffset + delta) * 10) / 10);
   }
@@ -301,7 +243,7 @@ class LyricsOverlay {
   setOffset(val) {
     this.userOffset = val;
     this.offsetVal.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}s`;
-    this.offsetVal.style.color = val === 0 ? 'rgba(255,255,255,0.6)' : 'var(--cl-accent)';
+    this.offsetVal.style.color = val === 0 ? 'rgba(255,255,255,0.6)' : '#00f0ff';
   }
 
   updateTrackInfo(track) {
@@ -319,28 +261,17 @@ class LyricsOverlay {
     }
 
     this.durationEl.textContent = LrcParser.formatTime(track.duration || 0);
-
-    if (typeof GenreDetector !== 'undefined') {
-      const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
-      this.setVibe(autoVibe);
-    }
   }
 
   updateLyrics(lyricsResult) {
     this.lyricsData = lyricsResult;
     this.lyricsContainer.innerHTML = '';
     this.activeLineIndex = -1;
-    this.activeWordIndex = -1;
 
     if (!lyricsResult || !lyricsResult.lines || lyricsResult.lines.length === 0) {
       const msg = lyricsResult && lyricsResult.instrumental
         ? '♪ Instrumental Track ♪'
-        : 'No synchronized lyrics found';
-
-      this.bouncyActiveEl.innerHTML = `<span class="cl-bouncy-word active">${msg}</span>`;
-      this.bouncyPrevEl.textContent = '';
-      this.bouncyNextEl.textContent = 'Enjoy the rhythm';
-
+        : 'No synchronized lyrics found for this song';
       this.lyricsContainer.innerHTML = `
         <div class="cl-status-view">
           <span style="font-size: 2rem;">✨</span>
@@ -350,7 +281,6 @@ class LyricsOverlay {
       return;
     }
 
-    // Populate waterfall scroll
     const fragment = document.createDocumentFragment();
     lyricsResult.lines.forEach((line, idx) => {
       const lineEl = document.createElement('div');
@@ -359,6 +289,7 @@ class LyricsOverlay {
       lineEl.dataset.time = line.time.toString();
       lineEl.textContent = line.text;
 
+      // Click to seek to that line!
       lineEl.addEventListener('click', () => {
         this.onSeek(line.time);
       });
@@ -370,6 +301,7 @@ class LyricsOverlay {
   }
 
   updateProgress({ currentTime, duration, isPaused }) {
+    // Update labels and scrubber
     this.currentTimeEl.textContent = LrcParser.formatTime(currentTime || 0);
     if (duration > 0) {
       const pct = Math.min(100, Math.max(0, (currentTime / duration) * 100));
@@ -377,86 +309,15 @@ class LyricsOverlay {
       this.durationEl.textContent = LrcParser.formatTime(duration);
     }
 
+    // Play/Pause icon
     this.playBtn.textContent = isPaused ? '▶' : '⏸';
 
+    // Update active lyric line
     if (!this.lyricsData || !this.lyricsData.lines || !this.lyricsData.isSynced) return;
 
-    // Fetch multi-line & word context
-    const ctx = LrcParser.getLyricsContext(this.lyricsData.lines, currentTime, this.userOffset);
-    if (ctx) {
-      this.renderBouncyLyrics(ctx);
-    }
-
-    // Waterfall active line update
-    const lineIdx = ctx ? ctx.lineIndex : LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
-    if (lineIdx !== this.activeLineIndex) {
-      this.setActiveLine(lineIdx);
-    }
-  }
-
-  /**
-   * Instagram Story Bouncy Lyric Presentation:
-   * Smoothly slides up previous phrases, springs in the active phrase,
-   * and runs the bouncy spring pop animation on each active word.
-   */
-  renderBouncyLyrics(ctx) {
-    const { lineIndex, activeWordIndex, currentLine, prevLine, nextLine } = ctx;
-
-    // 1. Line change: Trigger slide-in and build words
-    if (lineIndex !== this.activeLineIndex) {
-      this.activeLineIndex = lineIndex;
-      this.activeWordIndex = -1;
-
-      // Previous line smoothly glides up
-      this.bouncyPrevEl.textContent = prevLine ? prevLine.text : '';
-      this.bouncyNextEl.textContent = nextLine ? nextLine.text : '';
-
-      // Rebuild active line words with slide-in animation
-      this.bouncyActiveEl.classList.remove('cl-line-slide-in');
-      void this.bouncyActiveEl.offsetWidth; // reflow
-      this.bouncyActiveEl.classList.add('cl-line-slide-in');
-
-      this.bouncyActiveEl.innerHTML = '';
-      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
-      
-      words.forEach((wObj, idx) => {
-        const span = document.createElement('span');
-        span.className = 'cl-bouncy-word';
-        span.dataset.index = idx;
-        span.textContent = wObj.word;
-
-        // Click word to seek
-        span.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.onSeek(wObj.time);
-        });
-
-        this.bouncyActiveEl.appendChild(span);
-      });
-    }
-
-    // 2. Word change: Run signature Instagram Spring Bounce
-    if (activeWordIndex !== this.activeWordIndex) {
-      this.activeWordIndex = activeWordIndex;
-
-      const spans = this.bouncyActiveEl.querySelectorAll('.cl-bouncy-word');
-      spans.forEach((span, idx) => {
-        span.classList.remove('active', 'passed', 'upcoming');
-        if (idx < activeWordIndex) {
-          span.classList.add('passed');
-        } else if (idx === activeWordIndex) {
-          span.classList.add('active');
-        } else {
-          span.classList.add('upcoming');
-        }
-      });
-
-      // Pulse ambient backdrop aura on the beat
-      if (this.radialGlow) {
-        this.radialGlow.classList.remove('cl-glow-pulse');
-        void this.radialGlow.offsetWidth;
-        this.radialGlow.classList.add('cl-glow-pulse');
-      }
+    const newIndex = LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
+    if (newIndex !== this.activeLineIndex) {
+      this.setActiveLine(newIndex);
     }
   }
 
@@ -464,12 +325,13 @@ class LyricsOverlay {
     const oldLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${this.activeLineIndex}"]`);
     if (oldLine) oldLine.classList.remove('cl-active');
 
+    this.activeLineIndex = index;
     if (index === -1) return;
 
     const newLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${index}"]`);
     if (newLine) {
       newLine.classList.add('cl-active');
-      if (this.displayMode === 'waterfall' && !this.isUserScrolling) {
+      if (!this.isUserScrolling) {
         this.scrollToActiveLine(true);
       }
     }

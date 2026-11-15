@@ -1,33 +1,31 @@
-# 🎤 Cool Lyrics (v1.4)
-> **Cinematic, Instagram Story Bouncy Synchronized Lyrics for Chrome**
+# 🎤 Cool Lyrics (v1.5)
+> **Distraction-Free, Pitch-Black Synchronized Lyrics for Chrome**
 
-**Cool Lyrics** turns your web music experience into a distraction-free, pitch-black visualizer inspired by **Instagram Story & Reel bouncy lyrics**. It displays full lyric phrases with **signature bouncy spring physics**, slide-up line transitions, and genre personalities on a pure `#000000` pitch-black canvas.
+**Cool Lyrics** turns your web music experience into a distraction-free, cinematic visualizer on a pure `#000000` pitch-black canvas. Designed with the beloved fluid vertical waterfall layout of Apple Music and Spotify Desktop, it features centered active line tracking, smooth depth-of-field blur on inactive lines, and clean glowing text highlights.
+
+Both the **in-page overlay** (`Alt + L`) and the **standalone cinema tab** (`Alt + Shift + L`) provide the exact same seamless, elegant experience.
 
 ---
 
-## 📸 The Instagram Story Bouncy Experience
+## ✨ Features
 
-### 1. 🦘 Signature Bouncy Word Spring (`insta-word-pop`)
-- The active phrase is front-and-center in bold, modern Instagram typography.
-- As the singer speaks each word, that specific word **bounces/springs forward** with organic spring elasticity (`scale(1.15)` overshoot -> settles at `1.08`), illuminated in white with a glowing highlight badge.
-- **Surrounding words remain fully legible** in the sentence, giving you complete musical context.
+### 1. 🌌 Pure Pitch-Black OLED Backdrop
+- Absolute `#000000` background for zero eye strain, minimal distraction, and infinite contrast on OLED/AMOLED displays.
+- Optional subtle **Aurora Glow** and **Cyber Neon** ambient aura modes.
 
-### 2. 🚀 Rhythmic Slide-Up & Fade Line Transitions
-- When a phrase finishes, it **smoothly glides upward and fades out** into the dark void.
-- The new incoming phrase **rises up from below** (`line-rise` animation) with words springing in to the beat.
-- The upcoming phrase waits subtly below in dimmed text.
+### 2. 📜 Fluid Waterfall Kinetic Scroll
+- **Dynamic Centering**: The active line smoothly glides to the center of your screen as the music plays.
+- **Pure Text Highlight**: No clunky boxes or borders around words. The active line scales up (`1.06x`) with a crisp, pure white glow (`text-shadow: 0 0 28px rgba(255, 255, 255, 0.4)`).
+- **Depth-of-Field Blur**: Inactive lines are dimmed and subtly blurred (`0.7px`), focusing your attention naturally on the current line while keeping the surrounding lyrics readable.
 
-### 3. 🖱️ Tactile Controls
-- **Click Any Word to Jump**: Click any word in the active phrase to seek audio playback directly to that second.
-- **Mode Toggle (`V`)**: Press `V` anytime to switch between **Instagram Bouncy Reel** and **Classic Waterfall Scroll**.
+### 3. 🖱️ Tactile & Interactive
+- **Click-to-Seek**: Click on any lyric line to jump audio playback instantly to that timestamp.
+- **Manual Browsing**: Scroll freely to explore the lyrics; auto-scroll intelligently resumes after 3.5 seconds of inactivity.
+- **Sync Offset Tuning**: Easily adjust lyric timing (`+0.5s`, `-0.5s`, reset) right from the bottom dock if a track is slightly out of sync.
 
-### 4. 🎭 Genre Personalities
-Switch vibes manually or let it auto-match the playing song:
-- 📸 **Insta Reel** *(Pop / Modern Anthems)*: Clean, bouncy *Plus Jakarta Sans* with cyan laser glow.
-- 💥 **Street Drill** *(Hip-Hop / Rap / Drill)*: Slanted 6° aggressive punch (*Bebas Neue* & *Syne*) with hot crimson neon highlights.
-- 🍷 **Editorial Vinyl** *(Lo-Fi / R&B / Soul / Ballads)*: Elegant *Playfair Display* serif with italic word pop and champagne gold aura.
-- ⚡ **Cyber Matrix** *(Synthwave / EDM / Electronic)*: Wide futuristic *Space Grotesk* monospace with emerald matrix pulse.
-- 📜 **Pure Studio** *(Minimalist)*: Classic Apple Music-style vertical waterfall scroll.
+### 4. 🎛️ Dual Modes
+- **In-Page Overlay (`Alt + L`)**: Fullscreen cinematic overlay directly on top of Spotify Web, YouTube Music, or YouTube.
+- **Standalone Cinema Tab (`Alt + Shift + L`)**: Independent window/tab ideal for dual monitors, laptops plugged into TVs, or dedicated lyrics displays.
 
 ---
 
@@ -40,7 +38,7 @@ Switch vibes manually or let it auto-match the playing song:
    ```
    c:\Users\anubh\Desktop\My Projects\cool-lyrics
    ```
-4. Open [Spotify Web](https://open.spotify.com) or [YouTube Music](https://music.youtube.com), play any song, and press **`Alt + L`**!
+4. Open [Spotify Web](https://open.spotify.com), [YouTube Music](https://music.youtube.com), or [YouTube](https://www.youtube.com), play any song, and press **`Alt + L`** (or **`Alt + Shift + L`**)!
 
 ---
 
@@ -50,11 +48,10 @@ Switch vibes manually or let it auto-match the playing song:
 | --- | --- |
 | `Alt + L` | Toggle In-Page Pitch-Black Cinema Overlay |
 | `Alt + Shift + L` | Open Standalone Cinema Tab (Multi-monitor / TV) |
-| `V` | **Toggle Display Mode**: Instagram Bouncy Reel vs Waterfall Scroll |
 | `F` | Toggle Fullscreen Mode |
 | `Space` | Play / Pause playback |
 | `Esc` | Close In-Page Cinema Overlay |
-| `Click on any word` | Jump / Seek playback directly to that word |
+| `Click on any line` | Jump / Seek playback directly to that line |
 | `Scroll Wheel` | Temporarily pause auto-scroll to browse |
 
 ---
@@ -66,20 +63,19 @@ cool-lyrics/
 ├── manifest.json            # Manifest V3 configuration & CSP
 ├── icons/                   # High-res neon icons (16, 48, 128px)
 ├── utils/
-│   ├── genre-detector.js    # Smart genre/vibe estimator (Reel, Drill, Vinyl, Cyber)
 │   ├── title-cleaner.js     # Cleans YouTube/Spotify junk metadata ("(Official Video)", etc.)
-│   ├── lrc-parser.js        # Multi-line context & word timing engine
+│   ├── lrc-parser.js        # Millisecond timestamp parser & binary search active line locator
 │   └── lyrics-api.js        # LRCLIB API client with caching & fallback search
 ├── content/
 │   ├── content.js           # Multi-player monitor & scrubber controller
-│   ├── overlay.js           # In-page Instagram Story bouncy lyric component
-│   └── overlay.css          # Bouncy spring keyframes, slide-up lines & OLED backdrop
+│   ├── overlay.js           # In-page cinematic waterfall lyric component
+│   └── overlay.css          # Pitch-black OLED backdrop & fluid centering styles
 ├── cinema/
 │   ├── cinema.html          # Standalone theater mode for dual-monitor / TV
 │   ├── cinema.js            # Standalone state synchronization & controls
 │   └── cinema.css           # Standalone responsive cinema layout
 └── popup/
-│   ├── popup.html           # Toolbar action popup
-│   ├── popup.js             # Detects active song & quick launchers
-│   └── popup.css            # Dark sleek toolbar UI
+    ├── popup.html           # Toolbar action popup
+    ├── popup.js             # Detects active song & quick launchers
+    └── popup.css            # Dark sleek toolbar UI
 ```
