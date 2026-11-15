@@ -1,5 +1,9 @@
 /**
- * Cool Lyrics - Dedicated Standalone Cinema Mode
+ * Cool Lyrics - Dedicated Standalone Dual-Mode Cinema Visualizer
+ * Supports:
+ * 1. 📸 Instagram Story Bouncy Lyrics (Phrase slide-up, organic spring word pop, boxless text glow)
+ * 2. 📜 Waterfall Scroll (Apple Music style flowing vertical lyrics)
+ * + 💡 Philips WiZ Smart Bulb Ambient Room Sync
  */
 
 (function () {
@@ -7,13 +11,23 @@
   let currentTrack = null;
   let lyricsData = null;
   let activeIndex = -1;
+  let activeWordIndex = -1;
   let userOffset = 0;
-  let currentTheme = 'pure';
+  
+  let currentVibe = 'reel';
+  let displayMode = 'bouncy'; // 'bouncy' or 'waterfall'
+
   let isUserScrolling = false;
   let scrollResumeTimer = null;
   let idleTimer = null;
 
   // DOM Elements
+  const bouncyStage = document.getElementById('cinema-bouncy-stage');
+  const bouncyPrevEl = document.getElementById('cinema-bouncy-prev');
+  const bouncyActiveEl = document.getElementById('cinema-bouncy-active');
+  const bouncyNextEl = document.getElementById('cinema-bouncy-next');
+  const radialGlow = document.getElementById('cinema-radial-glow');
+
   const stage = document.getElementById('lyrics-stage');
   const linesWrapper = document.getElementById('lines-wrapper');
   const emptyState = document.getElementById('empty-state');
@@ -35,6 +49,10 @@
   const playIcon = document.getElementById('play-icon');
   const btnFullscreen = document.getElementById('btn-fullscreen');
 
+  const btnModeToggle = document.getElementById('btn-mode-toggle');
+  const cinemaModeIcon = document.getElementById('cinema-mode-icon');
+  const cinemaModeLabel = document.getElementById('cinema-mode-label');
+
   const syncMinus = document.getElementById('sync-minus');
   const syncPlus = document.getElementById('sync-plus');
   const syncReset = document.getElementById('sync-reset');
@@ -42,26 +60,30 @@
 
   function init() {
     bindEvents();
+    initWizControls();
     requestInitialState();
     listenForMessages();
     resetIdleTimer();
   }
 
   function bindEvents() {
-    // Theme switching
-    document.querySelectorAll('.cl-pill-btn').forEach(btn => {
+    // Vibe buttons
+    document.querySelectorAll('.cl-pill-btn[data-vibe]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.cl-pill-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        setTheme(btn.dataset.theme);
+        setVibe(btn.dataset.vibe);
       });
     });
 
-    // Fullscreen
+    // Display mode toggle
+    btnModeToggle.addEventListener('click', toggleDisplayMode);
+
+    // Fullscreen & Hotkeys
     btnFullscreen.addEventListener('click', toggleFullscreen);
     window.addEventListener('keydown', (e) => {
       if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen();
+      } else if (e.key === 'v' || e.key === 'V') {
+        toggleDisplayMode();
       } else if (e.key === ' ' && e.target === document.body) {
         e.preventDefault();
         sendMediaAction('TOGGLE_PLAY');
@@ -82,15 +104,12 @@
       sendMediaAction('SEEK', { time: targetTime });
     });
 
-    // WiZ Smart Light Controls
-    initWizControls();
-
     // Offset tuner
     syncMinus.addEventListener('click', () => adjustOffset(-0.5));
     syncPlus.addEventListener('click', () => adjustOffset(0.5));
     syncReset.addEventListener('click', () => setOffset(0));
 
-    // Manual scroll pause
+    // Manual scroll pause for waterfall
     stage.addEventListener('wheel', () => {
       isUserScrolling = true;
       clearTimeout(scrollResumeTimer);
@@ -114,9 +133,29 @@
     }, 3000);
   }
 
-  function setTheme(theme) {
-    currentTheme = theme;
-    document.body.className = `cl-theme-${theme}`;
+  function setVibe(vibe) {
+    currentVibe = vibe;
+    document.body.className = `cl-vibe-${vibe}`;
+
+    document.querySelectorAll('.cl-pill-btn[data-vibe]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.vibe === vibe);
+    });
+  }
+
+  function toggleDisplayMode() {
+    displayMode = displayMode === 'bouncy' ? 'waterfall' : 'bouncy';
+    if (displayMode === 'bouncy') {
+      bouncyStage.style.display = 'flex';
+      stage.style.display = 'none';
+      cinemaModeIcon.textContent = '✨';
+      cinemaModeLabel.textContent = 'Bouncy Reel';
+    } else {
+      bouncyStage.style.display = 'none';
+      stage.style.display = 'flex';
+      cinemaModeIcon.textContent = '📜';
+      cinemaModeLabel.textContent = 'Waterfall';
+      scrollToActive(false);
+    }
   }
 
   function toggleFullscreen() {
@@ -134,12 +173,13 @@
   function setOffset(val) {
     userOffset = val;
     syncVal.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}s`;
-    syncVal.style.color = val === 0 ? 'rgba(255,255,255,0.7)' : '#00f0ff';
+    syncVal.style.color = val === 0 ? 'rgba(255,255,255,0.6)' : '#00f0ff';
   }
 
   function requestInitialState() {
-    chrome.runtime.sendMessage({ action: 'GET_ACTIVE_SESSION' }, (res) => {
+    chrome.runtime.sendMessage({ action: 'GET_ACTIVE_TRACK' }, (res) => {
       if (res && res.track) {
+        activeTabId = res.tabId;
         handleTrackUpdate(res.track, res.lyrics);
       }
     });
@@ -148,6 +188,7 @@
   function listenForMessages() {
     chrome.runtime.onMessage.addListener((msg) => {
       if (msg.action === 'TRACK_CHANGED') {
+        activeTabId = msg.tabId;
         handleTrackUpdate(msg.track, msg.lyrics);
       } else if (msg.action === 'PLAYBACK_TICK') {
         handlePlaybackTick(msg.state);
@@ -165,7 +206,13 @@
       dockArt.src = track.artwork;
     }
 
-    // Sync ambient WiZ light with track
+    // Auto-detect vibe if not manually overridden
+    if (typeof GenreDetector !== 'undefined') {
+      const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
+      setVibe(autoVibe);
+    }
+
+    // WiZ Smart Light ambient track sync
     if (typeof wizClient !== 'undefined') {
       wizClient.syncTrack(track, dockArt);
     }
@@ -183,6 +230,10 @@
     emptyState.querySelector('.cl-empty-title').textContent = 'Searching lyrics...';
     emptyState.querySelector('.cl-empty-subtitle').textContent = `${track.title} • ${track.artist}`;
     linesWrapper.innerHTML = '';
+
+    bouncyActiveEl.innerHTML = `<span class="cl-bouncy-word active">Searching lyrics...</span>`;
+    bouncyPrevEl.textContent = '';
+    bouncyNextEl.textContent = '';
 
     try {
       const res = await LyricsAPI.fetchLyrics({
@@ -208,13 +259,19 @@
   function renderLyrics(data) {
     linesWrapper.innerHTML = '';
     activeIndex = -1;
+    activeWordIndex = -1;
 
     if (!data || !data.lines || data.lines.length === 0) {
-      emptyState.style.display = 'flex';
-      emptyState.querySelector('.cl-empty-title').textContent = data && data.instrumental
+      const msg = data && data.instrumental
         ? '♪ Instrumental Track ♪'
         : 'No lyrics available';
+      emptyState.style.display = 'flex';
+      emptyState.querySelector('.cl-empty-title').textContent = msg;
       emptyState.querySelector('.cl-empty-subtitle').textContent = 'Enjoy the rhythm';
+
+      bouncyActiveEl.innerHTML = `<span class="cl-bouncy-word active">${msg}</span>`;
+      bouncyPrevEl.textContent = '';
+      bouncyNextEl.textContent = '';
       return;
     }
 
@@ -240,7 +297,6 @@
   function handlePlaybackTick(state) {
     if (!state) return;
 
-    // Time & Scrubber
     timeCurrent.textContent = LrcParser.formatTime(state.currentTime);
     if (state.duration > 0) {
       timeTotal.textContent = LrcParser.formatTime(state.duration);
@@ -248,18 +304,85 @@
       scrubberFill.style.width = `${pct}%`;
     }
 
-    // Play/Pause icon
     if (state.isPaused) {
       playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
     } else {
       playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
     }
 
-    // Synced lyrics highlight
-    if (lyricsData && lyricsData.lines && lyricsData.isSynced) {
-      const idx = LrcParser.getActiveIndex(lyricsData.lines, state.currentTime, userOffset);
-      if (idx !== activeIndex) {
-        setActiveLine(idx);
+    if (!lyricsData || !lyricsData.lines || !lyricsData.isSynced) return;
+
+    // Instagram Bouncy Update
+    const ctx = LrcParser.getLyricsContext(lyricsData.lines, state.currentTime, userOffset);
+    if (ctx) {
+      renderCinemaBouncy(ctx);
+    }
+
+    // Waterfall active line update
+    const idx = ctx ? ctx.lineIndex : LrcParser.getActiveIndex(lyricsData.lines, state.currentTime, userOffset);
+    if (idx !== activeIndex) {
+      setActiveLine(idx);
+    }
+  }
+
+  function renderCinemaBouncy(ctx) {
+    const { lineIndex, activeWordIndex: newWordIdx, currentLine, prevLine, nextLine } = ctx;
+
+    // Line change: trigger slide-up transition
+    if (lineIndex !== activeIndex) {
+      activeIndex = lineIndex;
+      activeWordIndex = -1;
+
+      bouncyPrevEl.textContent = prevLine ? prevLine.text : '';
+      bouncyNextEl.textContent = nextLine ? nextLine.text : '';
+
+      bouncyActiveEl.classList.remove('cl-line-slide-in');
+      void bouncyActiveEl.offsetWidth;
+      bouncyActiveEl.classList.add('cl-line-slide-in');
+
+      bouncyActiveEl.innerHTML = '';
+      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
+      
+      words.forEach((wObj, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-bouncy-word';
+        span.dataset.index = idx;
+        span.textContent = wObj.word;
+
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sendMediaAction('SEEK', { time: wObj.time });
+        });
+
+        bouncyActiveEl.appendChild(span);
+      });
+
+      // WiZ pulse on line hit
+      if (typeof wizClient !== 'undefined') {
+        wizClient.pulseActiveLine();
+      }
+    }
+
+    // Word change: trigger bouncy spring pop
+    if (newWordIdx !== activeWordIndex) {
+      activeWordIndex = newWordIdx;
+
+      const spans = bouncyActiveEl.querySelectorAll('.cl-bouncy-word');
+      spans.forEach((span, idx) => {
+        span.classList.remove('active', 'passed', 'upcoming');
+        if (idx < newWordIdx) {
+          span.classList.add('passed');
+        } else if (idx === newWordIdx) {
+          span.classList.add('active');
+        } else {
+          span.classList.add('upcoming');
+        }
+      });
+
+      if (radialGlow) {
+        radialGlow.classList.remove('cl-glow-pulse');
+        void radialGlow.offsetWidth;
+        radialGlow.classList.add('cl-glow-pulse');
       }
     }
   }
@@ -268,18 +391,13 @@
     const oldEl = linesWrapper.querySelector(`.cl-line-item[data-index="${activeIndex}"]`);
     if (oldEl) oldEl.classList.remove('active');
 
-    activeIndex = idx;
     if (idx < 0) return;
 
     const newEl = linesWrapper.querySelector(`.cl-line-item[data-index="${idx}"]`);
     if (newEl) {
       newEl.classList.add('active');
-      if (!isUserScrolling) {
+      if (displayMode === 'waterfall' && !isUserScrolling) {
         scrollToActive(true);
-      }
-      // Gentle pulse accent on WiZ smart bulb on line change
-      if (typeof wizClient !== 'undefined') {
-        wizClient.pulseActiveLine();
       }
     }
   }
@@ -312,7 +430,6 @@
 
     if (!btnToggle || !popover) return;
 
-    // Toggle popover visibility
     btnToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       const isVisible = popover.style.display !== 'none';
@@ -326,7 +443,6 @@
       }
     });
 
-    // Handle Enable Switch
     enableToggle.addEventListener('change', () => {
       wizClient.isEnabled = enableToggle.checked;
       wizClient.saveSettings();
@@ -335,7 +451,6 @@
       }
     });
 
-    // Handle Mode Select
     modeSelect.addEventListener('change', () => {
       wizClient.mode = modeSelect.value;
       wizClient.saveSettings();
@@ -344,7 +459,6 @@
       }
     });
 
-    // Handle Brightness Slider
     brightnessSlider.addEventListener('input', () => {
       const val = parseInt(brightnessSlider.value, 10);
       brightnessVal.textContent = `${val}%`;
@@ -355,27 +469,23 @@
       }
     });
 
-    // Handle Pulse Toggle
     pulseToggle.addEventListener('change', () => {
       wizClient.pulseOnLyric = pulseToggle.checked;
       wizClient.saveSettings();
     });
 
-    // Test Button
     btnTest.addEventListener('click', async () => {
       btnTest.textContent = 'Flashing...';
       await wizClient.testFlash();
       setTimeout(() => { btnTest.textContent = '✨ Test Flash'; }, 1200);
     });
 
-    // Scan Button
     btnScan.addEventListener('click', async () => {
       btnScan.textContent = 'Scanning...';
       await wizClient.triggerDiscovery();
       btnScan.textContent = '🔍 Scan';
     });
 
-    // Listen to WiZ client status updates
     wizClient.addListener((state) => {
       enableToggle.checked = state.isEnabled;
       modeSelect.value = state.mode;
@@ -396,7 +506,6 @@
         statusBadge.textContent = 'Bridge offline';
         statusBadge.className = 'cl-wiz-chip';
         wizDot.className = 'cl-wiz-status-dot';
-        statusBadge.title = 'Run "node bridge/wiz-bridge.js" or start-bridge.bat';
       }
     });
   }

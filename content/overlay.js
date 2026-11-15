@@ -1,5 +1,9 @@
 /**
- * Cool Lyrics - In-Page Pitch Black Cinema Overlay Component
+ * Cool Lyrics - Instagram Story Bouncy Lyrics & Waterfall Overlay Component
+ * Supports:
+ * 1. 📸 Instagram Story Bouncy Lyrics (Rhythmic phrase slide-up, bouncy spring word highlights, boxless text glow)
+ * 2. 📜 Waterfall Scroll (Apple Music style flowing vertical lyrics)
+ * + 💡 Philips WiZ Smart Bulb Ambient Room Sync
  */
 
 class LyricsOverlay {
@@ -12,10 +16,14 @@ class LyricsOverlay {
 
     this.isVisible = false;
     this.currentTrack = null;
-    this.lyricsData = null; // { lines: [], isSynced: boolean }
+    this.lyricsData = null;
     this.activeLineIndex = -1;
-    this.userOffset = 0; // seconds
-    this.theme = 'pure-black'; // 'pure-black', 'ambient', 'neon'
+    this.activeWordIndex = -1;
+    this.userOffset = 0;
+    
+    this.displayMode = 'bouncy'; // 'bouncy' (Instagram Story) or 'waterfall' (Classic Scroll)
+    this.currentVibe = 'reel';   // 'reel', 'slanted', 'editorial', 'cyber', 'classic'
+
     this.idleTimer = null;
     this.isUserScrolling = false;
     this.userScrollResumeTimer = null;
@@ -28,9 +36,10 @@ class LyricsOverlay {
 
     const root = document.createElement('div');
     root.id = 'cool-lyrics-root';
+    root.className = `cl-vibe-${this.currentVibe}`;
     root.innerHTML = `
       <div class="cl-bg-layer">
-        <div class="cl-bg-glow"></div>
+        <div class="cl-bg-glow" id="cl-radial-glow"></div>
       </div>
 
       <!-- Header -->
@@ -44,6 +53,21 @@ class LyricsOverlay {
         </div>
 
         <div class="cl-header-actions">
+          <!-- Vibe Selector -->
+          <div class="cl-vibe-pill-group" id="cl-vibe-selector">
+            <button class="cl-vibe-pill active" data-vibe="reel">📸 Reel</button>
+            <button class="cl-vibe-pill" data-vibe="slanted">💥 Drill</button>
+            <button class="cl-vibe-pill" data-vibe="editorial">🍷 Vinyl</button>
+            <button class="cl-vibe-pill" data-vibe="cyber">⚡ Matrix</button>
+            <button class="cl-vibe-pill" data-vibe="classic">📜 Scroll</button>
+          </div>
+
+          <!-- Mode Toggle (Instagram Bouncy Reel vs Waterfall Scroll) -->
+          <button class="cl-btn" id="cl-btn-mode" title="Toggle Display Mode (V)">
+            <span id="cl-mode-icon">✨</span> <span id="cl-mode-text">Bouncy Reel</span>
+          </button>
+
+          <!-- WiZ Smart Light Ambient Sync -->
           <div class="cl-wiz-wrapper" style="position: relative;">
             <button class="cl-btn" id="cl-btn-wiz" title="Philips WiZ Smart Bulb Sync">
               <span class="cl-wiz-status-dot" id="cl-overlay-wiz-dot"></span>
@@ -96,10 +120,7 @@ class LyricsOverlay {
             </div>
           </div>
 
-          <button class="cl-btn" id="cl-btn-theme" title="Cycle visual theme">
-            <span>✨</span> <span id="cl-theme-name">Pitch Black</span>
-          </button>
-          <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Open in Standalone Cinema Window">
+          <button class="cl-btn cl-btn-icon" id="cl-btn-popout" title="Standalone Window">
             <span>⧉</span>
           </button>
           <button class="cl-btn cl-btn-icon" id="cl-btn-fullscreen" title="Fullscreen (F)">
@@ -111,8 +132,19 @@ class LyricsOverlay {
         </div>
       </header>
 
-      <!-- Center Lyrics Scroll Container -->
-      <main class="cl-lyrics-container" id="cl-lyrics-scroll">
+      <!-- Stage 1: Instagram Story Bouncy Lyrics Stage -->
+      <main class="cl-bouncy-stage" id="cl-bouncy-stage">
+        <div class="cl-bouncy-wrapper">
+          <div class="cl-bouncy-prev" id="cl-bouncy-prev"></div>
+          <div class="cl-bouncy-active" id="cl-bouncy-active">
+            <span class="cl-bouncy-word active">READY</span>
+          </div>
+          <div class="cl-bouncy-next" id="cl-bouncy-next"></div>
+        </div>
+      </main>
+
+      <!-- Stage 2: Classic Waterfall Scroll Container -->
+      <main class="cl-lyrics-container" id="cl-lyrics-scroll" style="display: none;">
         <div class="cl-status-view">
           <div class="cl-spinner"></div>
           <span>Waiting for track to start...</span>
@@ -145,6 +177,7 @@ class LyricsOverlay {
           </div>
 
           <div style="font-size: 0.8rem; color: rgba(255,255,255,0.4);">
+            <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">V</kbd> Mode &bull;
             <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Esc</kbd> Exit
           </div>
         </div>
@@ -157,7 +190,13 @@ class LyricsOverlay {
     // Cache elements
     this.header = root.querySelector('.cl-header');
     this.footer = root.querySelector('.cl-footer');
+    this.bouncyStage = root.querySelector('#cl-bouncy-stage');
+    this.bouncyPrevEl = root.querySelector('#cl-bouncy-prev');
+    this.bouncyActiveEl = root.querySelector('#cl-bouncy-active');
+    this.bouncyNextEl = root.querySelector('#cl-bouncy-next');
+    this.radialGlow = root.querySelector('#cl-radial-glow');
     this.lyricsContainer = root.querySelector('#cl-lyrics-scroll');
+
     this.artworkImg = root.querySelector('.cl-artwork');
     this.titleEl = root.querySelector('.cl-track-title');
     this.artistEl = root.querySelector('.cl-track-artist');
@@ -166,10 +205,13 @@ class LyricsOverlay {
     this.progressBar = root.querySelector('#cl-progress-bar');
     this.progressFill = root.querySelector('#cl-progress-fill');
     this.playBtn = root.querySelector('#cl-btn-play');
-    this.themeName = root.querySelector('#cl-theme-name');
     this.offsetVal = root.querySelector('#cl-offset-val');
+    this.btnMode = root.querySelector('#cl-btn-mode');
+    this.modeIcon = root.querySelector('#cl-mode-icon');
+    this.modeText = root.querySelector('#cl-mode-text');
 
     this.bindEvents();
+    this.initWizOverlayControls();
   }
 
   bindEvents() {
@@ -180,16 +222,20 @@ class LyricsOverlay {
     // Fullscreen
     this.root.querySelector('#cl-btn-fullscreen').addEventListener('click', () => this.toggleFullscreen());
 
+    // Mode Toggle
+    this.btnMode.addEventListener('click', () => this.toggleDisplayMode());
+
+    // Vibe Selectors
+    this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.setVibe(btn.dataset.vibe);
+      });
+    });
+
     // Playback buttons
     this.playBtn.addEventListener('click', () => this.onTogglePlay());
     this.root.querySelector('#cl-btn-prev').addEventListener('click', () => this.onPrev());
     this.root.querySelector('#cl-btn-next').addEventListener('click', () => this.onNext());
-
-    // Theme cycle
-    this.root.querySelector('#cl-btn-theme').addEventListener('click', () => this.cycleTheme());
-
-    // WiZ Smart Light Controls
-    this.initWizOverlayControls();
 
     // Offset tuner
     this.root.querySelector('#cl-offset-minus').addEventListener('click', () => this.adjustOffset(-0.5));
@@ -204,7 +250,7 @@ class LyricsOverlay {
       this.onSeek(pos * this.currentTrack.duration);
     });
 
-    // Handle manual scrolling pause/resume
+    // Handle manual scrolling pause/resume for waterfall mode
     this.lyricsContainer.addEventListener('wheel', () => {
       this.isUserScrolling = true;
       clearTimeout(this.userScrollResumeTimer);
@@ -222,6 +268,8 @@ class LyricsOverlay {
       if (!this.isVisible) return;
       if (e.key === 'Escape') {
         this.hide();
+      } else if (e.key === 'v' || e.key === 'V') {
+        this.toggleDisplayMode();
       } else if (e.key === ' ' && e.target === document.body) {
         e.preventDefault();
         this.onTogglePlay();
@@ -229,6 +277,31 @@ class LyricsOverlay {
         this.toggleFullscreen();
       }
     });
+  }
+
+  setVibe(vibe) {
+    this.currentVibe = vibe;
+    this.root.className = `cl-vibe-${vibe} ${this.isVisible ? 'cl-visible' : ''}`;
+
+    this.root.querySelectorAll('.cl-vibe-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.vibe === vibe);
+    });
+  }
+
+  toggleDisplayMode() {
+    this.displayMode = this.displayMode === 'bouncy' ? 'waterfall' : 'bouncy';
+    if (this.displayMode === 'bouncy') {
+      this.bouncyStage.style.display = 'flex';
+      this.lyricsContainer.style.display = 'none';
+      this.modeIcon.textContent = '✨';
+      this.modeText.textContent = 'Bouncy Reel';
+    } else {
+      this.bouncyStage.style.display = 'none';
+      this.lyricsContainer.style.display = 'flex';
+      this.modeIcon.textContent = '📜';
+      this.modeText.textContent = 'Waterfall';
+      this.scrollToActiveLine(false);
+    }
   }
 
   resetIdleTimer() {
@@ -247,7 +320,9 @@ class LyricsOverlay {
     this.isVisible = true;
     this.root.classList.add('cl-visible');
     this.resetIdleTimer();
-    this.scrollToActiveLine(false);
+    if (this.displayMode === 'waterfall') {
+      this.scrollToActiveLine(false);
+    }
   }
 
   hide() {
@@ -272,23 +347,6 @@ class LyricsOverlay {
     } else {
       document.exitFullscreen().catch(() => {});
     }
-  }
-
-  cycleTheme() {
-    const themes = ['pure-black', 'ambient', 'neon'];
-    const names = {
-      'pure-black': 'Pitch Black',
-      'ambient': 'Aurora Glow',
-      'neon': 'Cyber Neon'
-    };
-    const nextIdx = (themes.indexOf(this.theme) + 1) % themes.length;
-    this.theme = themes[nextIdx];
-
-    this.root.classList.remove('cl-theme-ambient', 'cl-theme-neon');
-    if (this.theme === 'ambient') this.root.classList.add('cl-theme-ambient');
-    if (this.theme === 'neon') this.root.classList.add('cl-theme-neon');
-
-    this.themeName.textContent = names[this.theme];
   }
 
   adjustOffset(delta) {
@@ -317,6 +375,12 @@ class LyricsOverlay {
 
     this.durationEl.textContent = LrcParser.formatTime(track.duration || 0);
 
+    // Auto-detect vibe
+    if (typeof GenreDetector !== 'undefined') {
+      const autoVibe = GenreDetector.detectVibe(track.artist, track.title);
+      this.setVibe(autoVibe);
+    }
+
     // WiZ Smart Light ambient track sync
     if (typeof wizClient !== 'undefined') {
       wizClient.syncTrack(track, this.artworkImg);
@@ -327,11 +391,17 @@ class LyricsOverlay {
     this.lyricsData = lyricsResult;
     this.lyricsContainer.innerHTML = '';
     this.activeLineIndex = -1;
+    this.activeWordIndex = -1;
 
     if (!lyricsResult || !lyricsResult.lines || lyricsResult.lines.length === 0) {
       const msg = lyricsResult && lyricsResult.instrumental
         ? '♪ Instrumental Track ♪'
         : 'No synchronized lyrics found for this song';
+
+      this.bouncyActiveEl.innerHTML = `<span class="cl-bouncy-word active">${msg}</span>`;
+      this.bouncyPrevEl.textContent = '';
+      this.bouncyNextEl.textContent = 'Enjoy the rhythm';
+
       this.lyricsContainer.innerHTML = `
         <div class="cl-status-view">
           <span style="font-size: 2rem;">✨</span>
@@ -341,6 +411,7 @@ class LyricsOverlay {
       return;
     }
 
+    // Populate waterfall scroll
     const fragment = document.createDocumentFragment();
     lyricsResult.lines.forEach((line, idx) => {
       const lineEl = document.createElement('div');
@@ -349,7 +420,6 @@ class LyricsOverlay {
       lineEl.dataset.time = line.time.toString();
       lineEl.textContent = line.text;
 
-      // Click to seek to that line!
       lineEl.addEventListener('click', () => {
         this.onSeek(line.time);
       });
@@ -361,7 +431,6 @@ class LyricsOverlay {
   }
 
   updateProgress({ currentTime, duration, isPaused }) {
-    // Update labels and scrubber
     this.currentTimeEl.textContent = LrcParser.formatTime(currentTime || 0);
     if (duration > 0) {
       const pct = Math.min(100, Math.max(0, (currentTime / duration) * 100));
@@ -369,15 +438,87 @@ class LyricsOverlay {
       this.durationEl.textContent = LrcParser.formatTime(duration);
     }
 
-    // Play/Pause icon
     this.playBtn.textContent = isPaused ? '▶' : '⏸';
 
-    // Update active lyric line
     if (!this.lyricsData || !this.lyricsData.lines || !this.lyricsData.isSynced) return;
 
-    const newIndex = LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
-    if (newIndex !== this.activeLineIndex) {
-      this.setActiveLine(newIndex);
+    // Fetch multi-line & word context
+    const ctx = LrcParser.getLyricsContext(this.lyricsData.lines, currentTime, this.userOffset);
+    if (ctx) {
+      this.renderBouncyLyrics(ctx);
+    }
+
+    // Waterfall active line update
+    const lineIdx = ctx ? ctx.lineIndex : LrcParser.getActiveIndex(this.lyricsData.lines, currentTime, this.userOffset);
+    if (lineIdx !== this.activeLineIndex) {
+      this.setActiveLine(lineIdx);
+    }
+  }
+
+  /**
+   * Instagram Story Bouncy Lyric Presentation:
+   * Smoothly slides up previous phrases, springs in the active phrase,
+   * and runs the bouncy spring pop animation on each active word with boxless text glow.
+   */
+  renderBouncyLyrics(ctx) {
+    const { lineIndex, activeWordIndex, currentLine, prevLine, nextLine } = ctx;
+
+    // Line change: Trigger slide-in and build words
+    if (lineIndex !== this.activeLineIndex) {
+      this.activeLineIndex = lineIndex;
+      this.activeWordIndex = -1;
+
+      this.bouncyPrevEl.textContent = prevLine ? prevLine.text : '';
+      this.bouncyNextEl.textContent = nextLine ? nextLine.text : '';
+
+      this.bouncyActiveEl.classList.remove('cl-line-slide-in');
+      void this.bouncyActiveEl.offsetWidth; // reflow
+      this.bouncyActiveEl.classList.add('cl-line-slide-in');
+
+      this.bouncyActiveEl.innerHTML = '';
+      const words = currentLine.words || [{ word: currentLine.text, time: currentLine.time }];
+      
+      words.forEach((wObj, idx) => {
+        const span = document.createElement('span');
+        span.className = 'cl-bouncy-word';
+        span.dataset.index = idx;
+        span.textContent = wObj.word;
+
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.onSeek(wObj.time);
+        });
+
+        this.bouncyActiveEl.appendChild(span);
+      });
+
+      // WiZ pulse on line hit
+      if (typeof wizClient !== 'undefined') {
+        wizClient.pulseActiveLine();
+      }
+    }
+
+    // Word change: Run signature Instagram Spring Bounce
+    if (activeWordIndex !== this.activeWordIndex) {
+      this.activeWordIndex = activeWordIndex;
+
+      const spans = this.bouncyActiveEl.querySelectorAll('.cl-bouncy-word');
+      spans.forEach((span, idx) => {
+        span.classList.remove('active', 'passed', 'upcoming');
+        if (idx < activeWordIndex) {
+          span.classList.add('passed');
+        } else if (idx === activeWordIndex) {
+          span.classList.add('active');
+        } else {
+          span.classList.add('upcoming');
+        }
+      });
+
+      if (this.radialGlow) {
+        this.radialGlow.classList.remove('cl-glow-pulse');
+        void this.radialGlow.offsetWidth;
+        this.radialGlow.classList.add('cl-glow-pulse');
+      }
     }
   }
 
@@ -385,19 +526,25 @@ class LyricsOverlay {
     const oldLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${this.activeLineIndex}"]`);
     if (oldLine) oldLine.classList.remove('cl-active');
 
-    this.activeLineIndex = index;
     if (index === -1) return;
 
     const newLine = this.lyricsContainer.querySelector(`.cl-line[data-index="${index}"]`);
     if (newLine) {
       newLine.classList.add('cl-active');
-      if (!this.isUserScrolling) {
+      if (this.displayMode === 'waterfall' && !this.isUserScrolling) {
         this.scrollToActiveLine(true);
       }
-      // Gentle pulse accent on WiZ smart bulb on line change
-      if (typeof wizClient !== 'undefined') {
-        wizClient.pulseActiveLine();
-      }
+    }
+  }
+
+  scrollToActiveLine(smooth = true) {
+    if (this.activeLineIndex < 0) return;
+    const activeEl = this.lyricsContainer.querySelector(`.cl-line[data-index="${this.activeLineIndex}"]`);
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        behavior: smooth ? 'smooth' : 'auto',
+        block: 'center'
+      });
     }
   }
 
@@ -418,7 +565,6 @@ class LyricsOverlay {
 
     if (!btnToggle || !popover) return;
 
-    // Toggle popover visibility
     btnToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       const isVisible = popover.style.display !== 'none';
@@ -432,7 +578,6 @@ class LyricsOverlay {
       }
     });
 
-    // Handle Enable Switch
     enableToggle.addEventListener('change', () => {
       wizClient.isEnabled = enableToggle.checked;
       wizClient.saveSettings();
@@ -441,7 +586,6 @@ class LyricsOverlay {
       }
     });
 
-    // Handle Mode Select
     modeSelect.addEventListener('change', () => {
       wizClient.mode = modeSelect.value;
       wizClient.saveSettings();
@@ -450,7 +594,6 @@ class LyricsOverlay {
       }
     });
 
-    // Handle Brightness Slider
     brightnessSlider.addEventListener('input', () => {
       const val = parseInt(brightnessSlider.value, 10);
       brightnessVal.textContent = `${val}%`;
@@ -461,27 +604,23 @@ class LyricsOverlay {
       }
     });
 
-    // Handle Pulse Toggle
     pulseToggle.addEventListener('change', () => {
       wizClient.pulseOnLyric = pulseToggle.checked;
       wizClient.saveSettings();
     });
 
-    // Test Button
     btnTest.addEventListener('click', async () => {
       btnTest.textContent = 'Flashing...';
       await wizClient.testFlash();
       setTimeout(() => { btnTest.textContent = '✨ Test Flash'; }, 1200);
     });
 
-    // Scan Button
     btnScan.addEventListener('click', async () => {
       btnScan.textContent = 'Scanning...';
       await wizClient.triggerDiscovery();
       btnScan.textContent = '🔍 Scan';
     });
 
-    // Listen to WiZ client status updates
     wizClient.addListener((state) => {
       enableToggle.checked = state.isEnabled;
       modeSelect.value = state.mode;
@@ -502,20 +641,8 @@ class LyricsOverlay {
         statusBadge.textContent = 'Bridge offline';
         statusBadge.className = 'cl-wiz-chip';
         wizDot.className = 'cl-wiz-status-dot';
-        statusBadge.title = 'Run "node bridge/wiz-bridge.js" or start-bridge.bat';
       }
     });
-  }
-
-  scrollToActiveLine(smooth = true) {
-    if (this.activeLineIndex < 0) return;
-    const activeEl = this.lyricsContainer.querySelector(`.cl-line[data-index="${this.activeLineIndex}"]`);
-    if (activeEl) {
-      activeEl.scrollIntoView({
-        behavior: smooth ? 'smooth' : 'auto',
-        block: 'center'
-      });
-    }
   }
 }
 

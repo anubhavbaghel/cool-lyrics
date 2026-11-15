@@ -7,15 +7,14 @@
   <link rel="icon" type="image/png" href="../icons/icon48.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cinema.css">
 </head>
-<body class="cl-theme-pure">
+<body class="cl-vibe-reel">
   <div class="cl-cinema-root">
-    <!-- Ambient aura background layer (toggleable) -->
+    <!-- Ambient radial glow backdrop -->
     <div class="cl-aura-bg">
-      <div class="cl-glow-orb cl-orb-1"></div>
-      <div class="cl-glow-orb cl-orb-2"></div>
+      <div class="cl-radial-glow" id="cinema-radial-glow"></div>
     </div>
 
     <!-- Top Navigation & Track Meta -->
@@ -26,11 +25,19 @@
       </div>
 
       <div class="cl-actions">
-        <div class="cl-theme-selector">
-          <button class="cl-pill-btn active" data-theme="pure">Pitch Black</button>
-          <button class="cl-pill-btn" data-theme="aurora">Aurora Glow</button>
-          <button class="cl-pill-btn" data-theme="neon">Cyber Neon</button>
+        <!-- Genre / Vibe Selector -->
+        <div class="cl-vibe-selector" id="cinema-vibe-selector">
+          <button class="cl-pill-btn active" data-vibe="reel">📸 Reel</button>
+          <button class="cl-pill-btn" data-vibe="slanted">💥 Drill</button>
+          <button class="cl-pill-btn" data-vibe="editorial">🍷 Vinyl</button>
+          <button class="cl-pill-btn" data-vibe="cyber">⚡ Matrix</button>
+          <button class="cl-pill-btn" data-vibe="classic">📜 Scroll</button>
         </div>
+
+        <!-- Mode Toggle (Instagram Bouncy Reel vs Waterfall Scroll) -->
+        <button class="cl-mode-btn" id="btn-mode-toggle" title="Toggle Display Mode (V)">
+          <span id="cinema-mode-icon">✨</span> <span id="cinema-mode-label">Bouncy Reel</span>
+        </button>
 
         <!-- WiZ Smart Light Ambient Sync -->
         <div class="cl-wiz-wrapper">
@@ -93,8 +100,19 @@
       </div>
     </header>
 
-    <!-- Main Lyrics Scroll Stage -->
-    <main class="cl-stage" id="lyrics-stage">
+    <!-- Stage 1: Instagram Story Bouncy Lyrics Stage -->
+    <main class="cl-bouncy-stage" id="cinema-bouncy-stage">
+      <div class="cl-bouncy-wrapper">
+        <div class="cl-bouncy-prev" id="cinema-bouncy-prev"></div>
+        <div class="cl-bouncy-active" id="cinema-bouncy-active">
+          <span class="cl-bouncy-word active">READY</span>
+        </div>
+        <div class="cl-bouncy-next" id="cinema-bouncy-next"></div>
+      </div>
+    </main>
+
+    <!-- Stage 2: Classic Waterfall Scroll Stage -->
+    <main class="cl-stage" id="lyrics-stage" style="display: none;">
       <div class="cl-empty-state" id="empty-state">
         <div class="cl-pulse-ring"></div>
         <p class="cl-empty-title">Waiting for music...</p>
@@ -153,6 +171,7 @@
   </div>
 
   <script src="../utils/title-cleaner.js"></script>
+  <script src="../utils/genre-detector.js"></script>
   <script src="../utils/lrc-parser.js"></script>
   <script src="../utils/lyrics-api.js"></script>
   <script src="../utils/color-extractor.js"></script>

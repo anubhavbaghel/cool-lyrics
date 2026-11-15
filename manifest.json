@@ -44,6 +44,7 @@
       ],
       "js": [
         "utils/title-cleaner.js",
+        "utils/genre-detector.js",
         "utils/lrc-parser.js",
         "utils/lyrics-api.js",
         "utils/color-extractor.js",

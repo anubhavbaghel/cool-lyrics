@@ -1,25 +1,42 @@
-# 🎤 Cool Lyrics (v1.5)
+# 🎤 Cool Lyrics (v1.6)
 > **Distraction-Free, Pitch-Black Synchronized Lyrics for Chrome**  
-> *Now featuring Experimental Philips WiZ Multicolor Smart Bulb Ambient Room Sync!*
+> *With Instagram Bouncy Reel Mode, Waterfall Scroll Mode, and Philips WiZ Smart Bulb Ambient Room Sync!*
 
-**Cool Lyrics** turns your web music experience into a distraction-free, cinematic visualizer on a pure `#000000` pitch-black canvas. Designed with the beloved fluid vertical waterfall layout of Apple Music and Spotify Desktop, it features centered active line tracking, smooth depth-of-field blur on inactive lines, and clean glowing text highlights.
+**Cool Lyrics** turns your web music experience into a distraction-free, cinematic visualizer on a pure `#000000` pitch-black canvas. It gives you the freedom to toggle between **two distinct display modes** anytime:
+1. 📸 **Instagram Story Bouncy Mode**: Full phrases with organic spring-bouncing words on the beat, smooth upward slide transitions, and pure glowing text highlights (zero box outlines).
+2. 📜 **Classic Waterfall Scroll Mode**: Apple Music-style smooth vertical flowing waterfall with centered active line and photographic depth-of-field blur.
 
-Both the **in-page overlay** (`Alt + L`) and the **standalone cinema tab** (`Alt + Shift + L`) provide the exact same seamless, elegant experience.
+Both the **in-page overlay** (`Alt + L`) and the **standalone cinema tab** (`Alt + Shift + L`) provide the exact same seamless experience.
 
 ---
 
-## ✨ Features
+## 🎛️ Two Switchable Display Modes (Toggle with `V`)
 
-### 1. 🌌 Pure Pitch-Black OLED Backdrop
-- Absolute `#000000` background for zero eye strain, minimal distraction, and infinite contrast on OLED/AMOLED displays.
-- Optional subtle **Aurora Glow** and **Cyber Neon** ambient aura modes.
+### 1. 📸 Instagram Story Bouncy Reel Mode
+- **Organic Spring Word Pop**: Each word bounces forward (`scale(1.18)`) in sync with the singer's voice.
+- **Full Context**: Surrounding words in the phrase remain visible so you can always read ahead.
+- **Pure Text Highlight**: No clunky boxes or borders around words. Highlights use a radiant text-shadow glow (`0 0 16px, 0 0 32px, 0 0 60px`).
+- **Rhythmic Phrase Transitions**: When a phrase finishes, it glides upward and the next phrase slides in from below.
+- **Pulsing Radial Glow**: Ambient backdrop aura breathes with the beat.
 
-### 2. 📜 Fluid Waterfall Kinetic Scroll
-- **Dynamic Centering**: The active line smoothly glides to the center of your screen as the music plays.
-- **Pure Text Highlight**: No clunky boxes or borders around words. The active line scales up (`1.06x`) with a crisp, pure white glow (`text-shadow: 0 0 28px rgba(255, 255, 255, 0.4)`).
-- **Depth-of-Field Blur**: Inactive lines are dimmed and subtly blurred (`0.7px`), focusing your attention naturally on the current line while keeping the surrounding lyrics readable.
+### 2. 📜 Classic Waterfall Scroll Mode
+- **Centered Kinetic Flow**: Active line stays anchored at the vertical center of the screen as lyrics scroll automatically.
+- **Bold Plus Jakarta Sans**: Active line in commanding `2.85rem` (`font-weight: 900`).
+- **Depth-of-Field Blur**: Inactive lines are dimmed and softly blurred (`0.65px`) for cinematic focus.
 
-### 3. 💡 Experimental: Philips WiZ Smart Bulb Ambient Sync
+---
+
+## 🎭 5 Genre Personalities
+Switch vibes manually via the top bar or let it automatically match the song:
+- 📸 **Insta Reel** *(Pop / Anthems)*: Clean, bouncy *Plus Jakarta Sans* with cyan laser glow.
+- 💥 **Street Drill** *(Rap / Drill)*: Slanted -6° aggressive punch (*Bebas Neue* & *Syne*) with hot crimson neon highlights.
+- 🍷 **Editorial Vinyl** *(Lo-Fi / R&B / Soul / Ballads)*: Elegant *Playfair Display* serif with italic word pop and champagne gold aura.
+- ⚡ **Cyber Matrix** *(Synthwave / EDM / Electronic)*: Wide futuristic *Space Grotesk* monospace with emerald matrix pulse.
+- 📜 **Pure Studio** *(Minimalist)*: Clean Apple Music-style monochrome focus.
+
+---
+
+## 💡 Experimental: Philips WiZ Smart Bulb Ambient Sync
 - **Local Zero-Latency Sync**: Connects directly to Philips WiZ multicolor smart bulbs over local Wi-Fi (UDP port 38899).
 - **Dynamic Album Art Glow**: Real-time color extraction from playing track artwork paints your room in matching vibes.
 - **Vocal & Beat Pulse**: Subtle, rhythmic brightness breathing and color accents as new lyric lines are sung.
@@ -29,15 +46,6 @@ Both the **in-page overlay** (`Alt + L`) and the **standalone cinema tab** (`Alt
   - 🌌 **Aurora Emerald**: Deep mystical emerald waves.
   - 🕯️ **Warm Studio**: Cozy 2700K backlight.
 - **Controls**: One-click popup in the top navigation bar with live status, brightness slider, and instant test flash.
-
-### 4. 🖱️ Tactile & Interactive
-- **Click-to-Seek**: Click on any lyric line to jump audio playback instantly to that timestamp.
-- **Manual Browsing**: Scroll freely to explore the lyrics; auto-scroll intelligently resumes after 3.5 seconds of inactivity.
-- **Sync Offset Tuning**: Easily adjust lyric timing (`+0.5s`, `-0.5s`, reset) right from the bottom dock if a track is slightly out of sync.
-
-### 5. 🎛️ Dual Modes
-- **In-Page Overlay (`Alt + L`)**: Fullscreen cinematic overlay directly on top of Spotify Web, YouTube Music, or YouTube.
-- **Standalone Cinema Tab (`Alt + Shift + L`)**: Independent window/tab ideal for dual monitors, laptops plugged into TVs, or dedicated lyrics displays.
 
 ---
 
@@ -78,10 +86,11 @@ Because web browsers run in a secure sandbox that cannot send raw local UDP netw
 | --- | --- |
 | `Alt + L` | Toggle In-Page Pitch-Black Cinema Overlay |
 | `Alt + Shift + L` | Open Standalone Cinema Tab (Multi-monitor / TV) |
+| `V` | **Toggle Display Mode**: Instagram Bouncy Reel &harr; Waterfall Scroll |
 | `F` | Toggle Fullscreen Mode |
 | `Space` | Play / Pause playback |
 | `Esc` | Close In-Page Cinema Overlay |
-| `Click on any line` | Jump / Seek playback directly to that line |
+| `Click on any word/line` | Jump / Seek playback directly to that timestamp |
 | `Scroll Wheel` | Temporarily pause auto-scroll to browse |
 
 ---
@@ -97,14 +106,15 @@ cool-lyrics/
 │   └── start-bridge.bat     # One-click launcher for Windows
 ├── utils/
 │   ├── title-cleaner.js     # Cleans YouTube/Spotify junk metadata ("(Official Video)", etc.)
-│   ├── lrc-parser.js        # Millisecond timestamp parser & active line locator
+│   ├── genre-detector.js    # Smart genre/vibe estimator (Reel, Drill, Vinyl, Matrix)
+│   ├── lrc-parser.js        # Multi-line context & word timing engine
 │   ├── lyrics-api.js        # LRCLIB API client with caching & fallback search
 │   ├── color-extractor.js   # Vibrant palette extraction & harmonic mood generation
 │   └── wiz-client.js        # Browser client for WiZ bulb bridge communication
 ├── content/
 │   ├── content.js           # Multi-player monitor & scrubber controller
-│   ├── overlay.js           # In-page cinematic waterfall lyric component
-│   └── overlay.css          # Pitch-black OLED backdrop & fluid centering styles
+│   ├── overlay.js           # In-page dual-mode lyric component (Bouncy + Waterfall)
+│   └── overlay.css          # Bouncy spring keyframes, slide-up lines & OLED backdrop
 ├── cinema/
 │   ├── cinema.html          # Standalone theater mode for dual-monitor / TV
 │   ├── cinema.js            # Standalone state synchronization & controls

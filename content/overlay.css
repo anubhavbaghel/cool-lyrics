@@ -1,15 +1,19 @@
-/* Cool Lyrics - Pitch Black Cinema Overlay Styles */
+/* Cool Lyrics - Instagram Story Bouncy Lyrics Styling */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,700;0,800;1,700;1,800&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@600;700&family=Bebas+Neue&family=Syne:wght@700;800;900&display=swap');
 
 :root {
   --cl-bg: #000000;
-  --cl-text-primary: #ffffff;
-  --cl-text-dimmed: rgba(255, 255, 255, 0.25);
-  --cl-text-hover: rgba(255, 255, 255, 0.7);
-  --cl-accent-cyan: #00f0ff;
-  --cl-accent-magenta: #f43f5e;
-  --cl-font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cl-text-active: #ffffff;
+  --cl-text-idle: rgba(255, 255, 255, 0.72);
+  --cl-text-prev: rgba(255, 255, 255, 0.22);
+  --cl-text-next: rgba(255, 255, 255, 0.22);
+  --cl-accent: #00f0ff;
+  --cl-glow: rgba(0, 240, 255, 0.5);
+  --cl-highlight-bg: rgba(255, 255, 255, 0.14);
+  --cl-font-lyric: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --cl-font-meta: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --cl-skew: 0deg;
 }
 
 #cool-lyrics-root {
@@ -21,7 +25,7 @@
   z-index: 2147483647;
   background-color: #000000;
   color: #ffffff;
-  font-family: var(--cl-font-family);
+  font-family: var(--cl-font-meta);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -36,7 +40,59 @@
   pointer-events: auto;
 }
 
-/* Background effects */
+/* ===================================================
+   GENRE / VIBE THEMES (INSTAGRAM STICKER STYLES)
+   =================================================== */
+
+/* 1. 📸 Insta Bouncy (Classic Clean Pop Reel) */
+#cool-lyrics-root.cl-vibe-reel {
+  --cl-font-lyric: 'Plus Jakarta Sans', sans-serif;
+  --cl-accent: #00f0ff;
+  --cl-glow: rgba(0, 240, 255, 0.8);
+  --cl-skew: 0deg;
+}
+
+/* 2. 💥 Street Drill (Rap / Drill Slanted Punch) */
+#cool-lyrics-root.cl-vibe-slanted {
+  --cl-font-lyric: 'Bebas Neue', 'Syne', sans-serif;
+  --cl-accent: #ff0055;
+  --cl-glow: rgba(255, 0, 85, 0.85);
+  --cl-skew: -6deg;
+}
+
+#cool-lyrics-root.cl-vibe-slanted .cl-bouncy-word {
+  letter-spacing: 0.03em;
+}
+
+/* 3. 🍷 Editorial Vinyl (Soul / R&B / Ballads) */
+#cool-lyrics-root.cl-vibe-editorial {
+  --cl-font-lyric: 'Playfair Display', serif;
+  --cl-accent: #fbbf24;
+  --cl-glow: rgba(251, 191, 36, 0.75);
+  --cl-skew: 0deg;
+}
+
+#cool-lyrics-root.cl-vibe-editorial .cl-bouncy-word.active {
+  font-style: italic;
+}
+
+/* 4. ⚡ Cyber Matrix (EDM / Synth) */
+#cool-lyrics-root.cl-vibe-cyber {
+  --cl-font-lyric: 'Space Grotesk', monospace;
+  --cl-accent: #10b981;
+  --cl-glow: rgba(16, 185, 129, 0.8);
+  --cl-skew: 0deg;
+}
+
+/* 5. 📜 Pure Studio */
+#cool-lyrics-root.cl-vibe-classic {
+  --cl-font-lyric: 'Plus Jakarta Sans', sans-serif;
+  --cl-accent: #ffffff;
+  --cl-glow: rgba(255, 255, 255, 0.7);
+  --cl-skew: 0deg;
+}
+
+/* Pitch Black Background Canvas */
 .cl-bg-layer {
   position: absolute;
   inset: 0;
@@ -45,46 +101,51 @@
   overflow: hidden;
 }
 
-/* Ambient dynamic glow mode */
-.cl-theme-ambient .cl-bg-glow {
+/* Soft Radial Backdrop Aura */
+.cl-bg-glow {
   position: absolute;
-  width: 60vw;
-  height: 60vw;
+  top: 50%;
+  left: 50%;
+  width: 65vw;
+  height: 65vw;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.18;
+  filter: blur(140px);
+  background: radial-gradient(circle, var(--cl-glow) 0%, rgba(0,0,0,0) 65%);
+  opacity: 0.28;
   pointer-events: none;
-  transition: all 1.2s ease;
-  top: 20%;
-  left: 20%;
-  background: radial-gradient(circle, var(--cl-accent-cyan) 0%, var(--cl-accent-magenta) 70%, transparent 100%);
-  animation: cl-float 16s ease-in-out infinite alternate;
+  transition: opacity 0.5s ease;
+  will-change: transform, opacity;
 }
 
-@keyframes cl-float {
-  0% { transform: translate(-10%, -10%) scale(0.9); }
-  50% { transform: translate(15%, 10%) scale(1.1); }
-  100% { transform: translate(-5%, 15%) scale(1); }
+.cl-glow-pulse {
+  animation: cl-aura-beat 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
-/* Top Header Bar */
+@keyframes cl-aura-beat {
+  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.22; }
+  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.28; }
+}
+
+/* Top Header */
 .cl-header {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 20;
+  z-index: 50;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 36px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+  padding: 22px 36px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0) 100%);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .cl-header.cl-idle-hidden {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-12px);
   pointer-events: none;
 }
 
@@ -92,15 +153,15 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: 50%;
+  max-width: 45%;
 }
 
 .cl-artwork {
   width: 52px;
   height: 52px;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.8), 0 0 12px rgba(255,255,255,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.8), 0 0 16px rgba(255,255,255,0.06);
 }
 
 .cl-track-meta {
@@ -110,28 +171,61 @@
 }
 
 .cl-track-title {
+  font-family: var(--cl-font-lyric);
   font-size: 1.15rem;
   font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.02em;
 }
 
 .cl-track-artist {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .cl-header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.cl-vibe-pill-group {
+  display: flex;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 3px;
+  backdrop-filter: blur(14px);
+}
+
+.cl-vibe-pill {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--cl-font-meta);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cl-vibe-pill:hover {
+  color: #ffffff;
+}
+
+.cl-vibe-pill.active {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
 
 .cl-btn {
@@ -141,7 +235,7 @@
   border-radius: 20px;
   padding: 8px 16px;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -157,10 +251,6 @@
   transform: translateY(-1px);
 }
 
-.cl-btn:active {
-  transform: translateY(0);
-}
-
 .cl-btn-icon {
   width: 38px;
   height: 38px;
@@ -172,7 +262,154 @@
   font-size: 1.1rem;
 }
 
-/* Center Lyrics Container */
+/* ===================================================
+   INSTAGRAM STORY BOUNCY LYRIC STAGE
+   =================================================== */
+
+.cl-bouncy-stage {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8vw;
+  text-align: center;
+  overflow: hidden;
+}
+
+.cl-bouncy-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  transform: skewX(var(--cl-skew));
+  transition: transform 0.35s ease;
+}
+
+/* Previous Line: Glides Up & Fades Out */
+.cl-bouncy-prev {
+  font-family: var(--cl-font-lyric);
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--cl-text-prev);
+  filter: blur(1px);
+  transform: translateY(-8px);
+  opacity: 0.45;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 900px;
+}
+
+/* Center Stage: Active Bouncy Line */
+.cl-bouncy-active {
+  font-family: var(--cl-font-lyric);
+  font-size: clamp(2.6rem, 5.2vw, 4.8rem);
+  font-weight: 800;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 18px;
+  max-width: 1100px;
+  padding: 14px 24px;
+  border-radius: 28px;
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+/* Smooth Slide-In on New Line Arrival */
+.cl-line-slide-in {
+  animation: line-rise 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes line-rise {
+  0% { transform: translateY(28px) scale(0.95); opacity: 0.3; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* The Individual Words Inside the Active Line (Completely Boxless & Pure Text Highlight) */
+.cl-bouncy-word {
+  display: inline-block;
+  padding: 0 4px;
+  cursor: pointer;
+  position: relative;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--cl-text-idle);
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), text-shadow 0.25s ease;
+  will-change: transform, color, text-shadow;
+}
+
+/* When the Singer sings this Word: Luminous Text Highlight with Bouncy Spring Pop */
+.cl-bouncy-word.active {
+  color: #ffffff !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 900;
+  text-shadow: 0 0 16px var(--cl-glow), 0 0 32px var(--cl-glow), 0 0 60px var(--cl-accent);
+  animation: insta-word-pop 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes insta-word-pop {
+  0% { transform: scale(0.92) translateY(2px); }
+  50% { transform: scale(1.18) translateY(-4px); }
+  100% { transform: scale(1.10) translateY(-2px); }
+}
+
+/* Words that have already passed in the phrase */
+.cl-bouncy-word.passed {
+  color: rgba(255, 255, 255, 0.84);
+  transform: scale(1);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
+}
+
+/* Upcoming words in the line */
+.cl-bouncy-word.upcoming {
+  color: rgba(255, 255, 255, 0.40);
+  transform: scale(1);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: none;
+}
+
+.cl-bouncy-word:hover {
+  background: transparent !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.6);
+}
+
+/* Upcoming Line: Waiting Below */
+.cl-bouncy-next {
+  font-family: var(--cl-font-lyric);
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--cl-text-next);
+  filter: blur(1px);
+  transform: translateY(8px);
+  opacity: 0.45;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 900px;
+}
+
+/* ===================================================
+   WATERFALL SCROLL STAGE
+   =================================================== */
+
 .cl-lyrics-container {
   position: relative;
   z-index: 10;
@@ -180,62 +417,242 @@
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  padding: 40vh 8vw;
+  padding: 42vh 8vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .cl-lyrics-container::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
-/* Lyric Lines */
 .cl-line {
   margin: 18px 0;
   padding: 10px 24px;
-  border-radius: 16px;
-  font-family: var(--cl-font-family);
-  font-size: 2.35rem;
+  border-radius: 18px;
+  font-family: var(--cl-font-lyric);
+  font-size: 2.2rem;
   line-height: 1.35;
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
   text-align: center;
-  color: var(--cl-text-dimmed);
-  filter: blur(0.65px);
+  color: rgba(255, 255, 255, 0.24);
+  filter: blur(0.7px);
   transform: scale(0.96);
-  transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+  transition: all 0.38s cubic-bezier(0.2, 0.9, 0.3, 1);
   cursor: pointer;
   max-width: 960px;
   word-break: break-word;
-  position: relative;
 }
 
 .cl-line:hover {
-  color: var(--cl-text-hover);
+  color: rgba(255, 255, 255, 0.7);
   filter: blur(0);
-  transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-/* Active Lyric Line */
 .cl-line.cl-active {
   color: #ffffff;
-  font-size: 2.85rem;
+  font-size: 2.75rem;
   font-weight: 900;
-  letter-spacing: -0.03em;
   filter: blur(0);
-  transform: scale(1.06);
-  text-shadow: 0 0 35px rgba(255, 255, 255, 0.45);
-  background: rgba(255, 255, 255, 0.02);
+  transform: scale(1.05);
+  text-shadow: 0 0 32px var(--cl-glow);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-/* Neon Cyberpunk Theme */
-.cl-theme-neon .cl-line.cl-active {
-  color: var(--cl-accent-cyan);
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 35px rgba(0, 240, 255, 0.4);
+/* Status View */
+.cl-status-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.25rem;
 }
+
+.cl-spinner {
+  width: 46px;
+  height: 46px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--cl-accent);
+  border-radius: 50%;
+  animation: cl-spin 0.8s linear infinite;
+}
+
+@keyframes cl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Footer Controls Dock */
+.cl-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 36px 24px 36px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 60%, transparent 100%);
+  gap: 12px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.cl-footer.cl-idle-hidden {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
+.cl-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 650px;
+}
+
+.cl-time-label {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 42px;
+}
+
+.cl-progress-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  cursor: pointer;
+  position: relative;
+  transition: height 0.15s ease;
+}
+
+.cl-progress-track:hover {
+  height: 8px;
+}
+
+.cl-progress-fill {
+  height: 100%;
+  background: var(--cl-accent);
+  box-shadow: 0 0 10px var(--cl-glow);
+  border-radius: 999px;
+  position: relative;
+  width: 0%;
+}
+
+.cl-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 650px;
+}
+
+.cl-media-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cl-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cl-play-btn:hover {
+  transform: scale(1.08);
+  background: #f1f5f9;
+}
+
+.cl-offset-tuner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cl-offset-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.cl-offset-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Floating Launcher Pill */
+#cool-lyrics-floating-pill {
+  all: initial;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  background: #080808;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 16px rgba(0, 240, 255, 0.25);
+  color: #ffffff;
+  font-family: var(--cl-font-meta);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+#cool-lyrics-floating-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: #00f0ff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 240, 255, 0.45);
+}
+
+.cl-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
+  animation: cl-pulse 2s infinite ease-in-out;
+}
+
+@keyframes cl-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
 
 /* WiZ Smart Bulb Ambient Sync Styles */
 .cl-wiz-wrapper {
@@ -342,7 +759,7 @@
 .cl-range {
   flex: 1;
   margin: 0 10px;
-  accent-color: var(--cl-accent-cyan);
+  accent-color: #00f0ff;
   cursor: pointer;
 }
 
@@ -382,7 +799,7 @@
 }
 
 .cl-switch input:checked + .cl-slider {
-  background-color: var(--cl-accent-cyan);
+  background-color: #00f0ff;
 }
 
 .cl-switch input:checked + .cl-slider:before {
@@ -411,199 +828,4 @@
 .cl-wiz-action-btn:hover {
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Empty / Loading State */
-.cl-status-view {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 16px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.2rem;
-}
-
-.cl-spinner {
-  width: 44px;
-  height: 44px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--cl-accent-cyan);
-  border-radius: 50%;
-  animation: cl-spin 0.8s linear infinite;
-}
-
-@keyframes cl-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Bottom Controls Dock */
-.cl-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 18px 36px 28px 36px;
-  background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0) 100%);
-  gap: 14px;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.cl-footer.cl-idle-hidden {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-}
-
-/* Scrubber / Progress Bar */
-.cl-progress-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  max-width: 650px;
-}
-
-.cl-time-label {
-  font-size: 0.8rem;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.5);
-  min-width: 42px;
-}
-
-.cl-progress-track {
-  flex: 1;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  cursor: pointer;
-  position: relative;
-  transition: height 0.15s ease;
-}
-
-.cl-progress-track:hover {
-  height: 8px;
-}
-
-.cl-progress-fill {
-  height: 100%;
-  background: #ffffff;
-  border-radius: 999px;
-  position: relative;
-  width: 0%;
-}
-
-.cl-theme-neon .cl-progress-fill {
-  background: var(--cl-accent-cyan);
-  box-shadow: 0 0 8px var(--cl-accent-cyan);
-}
-
-.cl-controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 650px;
-}
-
-.cl-media-buttons {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.cl-play-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #ffffff;
-  color: #000000;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.cl-play-btn:hover {
-  transform: scale(1.08);
-  background: #f1f5f9;
-}
-
-.cl-offset-tuner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.cl-offset-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: background 0.15s;
-}
-
-.cl-offset-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-}
-
-/* Floating Launcher Pill on Spotify / YT */
-#cool-lyrics-floating-pill {
-  all: initial;
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 999999;
-  background: #080808;
-  border: 1px solid rgba(0, 240, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 16px rgba(0, 240, 255, 0.25);
-  color: #ffffff;
-  font-family: var(--cl-font-family);
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 9px 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
-}
-
-#cool-lyrics-floating-pill:hover {
-  transform: translateY(-2px) scale(1.04);
-  border-color: #00f0ff;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 240, 255, 0.45);
-}
-
-.cl-pill-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00f0ff;
-  box-shadow: 0 0 8px #00f0ff;
-  animation: cl-pulse 2s infinite ease-in-out;
-}
-
-@keyframes cl-pulse {
-  0%, 100% { opacity: 0.6; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.2); }
 }
